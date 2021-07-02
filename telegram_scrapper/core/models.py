@@ -1,6 +1,9 @@
 from django.db import models
 
 
+MEDIAS = ("audio", "document", "photo", "video")
+
+
 class Message(models.Model):
     message_id = models.BigIntegerField("ID da mensagem")
     group = models.CharField("Grupo", max_length=255)

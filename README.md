@@ -28,13 +28,15 @@ $ python manage.py migrate
 
 ## Comandos
 
-```bash
-# Busca e salva no `messages.db` as últimas mensagens dos grupos/canais
-$ python extract.py
+Busca mensagens no grupo e salva no banco de dados:
 
-# TODO
+```console
 $ python manage.py extract
+```
 
+### TODO
+
+```bash
 # Cria word count por dia
 $ python count_words.py
 
