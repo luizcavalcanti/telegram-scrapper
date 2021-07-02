@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "1.2.5"
+plotly = "5.1"
+unidecode = "1.2"
+telethon = "1.22"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
