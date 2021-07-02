@@ -122,3 +122,10 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Telegram Scrapper settings
+
+TELEGRAM_API_ID = config("TELEGRAM_API_ID", cast=int)
+TELEGRAM_API_HASH = config("TELEGRAM_API_HASH")
+TELEGRAM_GROUPS = config("TELEGRAM_GROUPS", cast=Csv())
