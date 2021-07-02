@@ -4,12 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+createnv = "*"
+dj-database-url = "*"
+django = "*"
 pandas = "1.2.5"
 plotly = "5.1"
-unidecode = "1.2"
+python-decouple = "*"
 telethon = "1.22"
+unidecode = "1.2"
 
 [dev-packages]
+black = "==21.6b0"
+ipython = "*"
 
 [requires]
 python_version = "3.9"
