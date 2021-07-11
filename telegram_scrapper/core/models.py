@@ -5,7 +5,7 @@ MEDIAS = ("audio", "document", "photo", "video")
 
 
 class Message(models.Model):
-    message_id = models.BigIntegerField("ID da mensagem")
+    message_id = models.BigIntegerField("ID da mensagem", unique=True)
     group = models.CharField("Grupo", max_length=255)
     sender = models.CharField("remetente", max_length=255)
     sent_at = models.DateTimeField("enviado em")
@@ -20,7 +20,4 @@ class Message(models.Model):
         verbose_name = "mensagem"
         verbose_name_plural = "mensagens"
         ordering = ["-sent_at"]
-        indexes = [
-            models.Index(fields=["sent_at"]),
-            models.Index(fields=["group"]),
-        ]
+        indexes = [models.Index(fields=["sent_at"]), models.Index(fields=["group"])]
