@@ -59,6 +59,7 @@ class Command(BaseCommand):
     def save_message(self, message, group):
         obj = Message(
             message_id=message.id,
+            message=message.message,
             group=group,
             sender=self.get_sender(message),
             sent_at=message.date,
@@ -72,6 +73,7 @@ class Command(BaseCommand):
 
             setattr(obj, kind, media.to_json())
 
+        # TODO: move to a separated command
         # with TemporaryDirectory() as tmp:
         #     # TODO Mudar campos no modelo de JSONField para FileField e salvar
         #     path = f"{tmp}/{media.id}"
