@@ -34,7 +34,7 @@ Busca mensagens no grupo e salva no banco de dados:
 $ python manage.py extract <numero de mensagens por grupo>
 ```
 
-Gerar dataset de frequência de termos/palavras por dia:
+Gera dataset de frequência de termos/palavras por dia:
 
 ```console
 $ python manage.py words
