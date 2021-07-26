@@ -21,3 +21,9 @@ class Message(models.Model):
         verbose_name_plural = "mensagens"
         ordering = ["-sent_at"]
         indexes = [models.Index(fields=["sent_at"]), models.Index(fields=["group"])]
+
+
+class MessageSummary(Message):
+    class Meta:
+        proxy = True
+        verbose_name_plural = '(WIP) Sumário de Mensagens'
