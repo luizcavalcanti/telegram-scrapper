@@ -59,6 +59,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         words = self.generate_word_frequency()
 
+        self.stdout.write(f"{len(words)} unique words found")
+
         json_file = json.dumps(words)
         f = open("words.json", "w")
         f.write(json_file)
@@ -66,11 +68,12 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("done"))
 
     def generate_word_frequency(self):
-        messages = Message.objects.exclude(message='')
-
-        self.stdout.write(self.style.SUCCESS(f"{len(messages)} messages found!"))
-
         words = {}
+
+        self.stdout.write("Fetching all text messages")
+        messages = Message.objects.exclude(message='')
+        self.stdout.write(f"{len(messages)} messages found")
+
         for message in messages:
             pieces = re.split(r"[\s]", message.message)
             date = f"{message.sent_at:%Y-%m-%d}"

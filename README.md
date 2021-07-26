@@ -31,18 +31,18 @@ $ python manage.py migrate
 Busca mensagens no grupo e salva no banco de dados:
 
 ```console
-$ python manage.py extract
+$ python manage.py extract <numero de mensagens por grupo>
+```
+
+Gerar dataset de frequência de termos/palavras por dia:
+
+```console
+$ python manage.py words
 ```
 
 ### TODO
 
 ```bash
-# Cria word count por dia
-$ python count_words.py
-
-# TODO
-$ python manage.py words
-
 # Plota gráfico sem-vergonha de aparição de termo por dia
 $ python plot.py <termo>
 
