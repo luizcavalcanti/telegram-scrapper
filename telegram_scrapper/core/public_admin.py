@@ -12,6 +12,7 @@ class MessageModelAdmin(PublicModelAdmin):
         'sender',
         'message',
         'has_audio',
+        'has_document',
         'has_image',
         'has_video',
         'sent_at',
@@ -22,6 +23,9 @@ class MessageModelAdmin(PublicModelAdmin):
     def has_audio(self, obj):
         return bool(obj.audio)
 
+    def has_document(self, obj):
+        return bool(obj.document)
+
     def has_image(self, obj):
         return bool(obj.photo)
 
@@ -29,10 +33,12 @@ class MessageModelAdmin(PublicModelAdmin):
         return bool(obj.video)
 
     has_audio.boolean = True
+    has_document.boolean = True
     has_image.boolean = True
     has_video.boolean = True
 
     has_audio.short_description = "audio"
+    has_document.short_description = "documento"
     has_image.short_description = "imagem"
     has_video.short_description = "video"
 
