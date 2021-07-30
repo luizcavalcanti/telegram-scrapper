@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from telethon import TelegramClient, sync
 from telethon.tl.types import PeerUser
-from telegram_scrapper.core.models import MEDIAS, Message
+from telegram_scrapper.core.models import MEDIAS, Message, Group
 
 import glob
 
@@ -36,8 +36,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         query_size = options["limit"]
         previous_count = Message.objects.count()
-        for group in settings.TELEGRAM_GROUPS:
-            self.update_group_messages(group, query_size)
+
+        groups = Group.objects.filter(active=True)
+        for group in groups:
+            self.update_group_messages(group.id, query_size)
 
         total = Message.objects.count()
         self.stdout.write(
