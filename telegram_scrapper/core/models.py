@@ -23,7 +23,11 @@ class Message(models.Model):
         indexes = [models.Index(fields=["sent_at"]), models.Index(fields=["group"])]
 
 
-class MessageSummary(Message):
+class Group(models.Model):
+    id = models.CharField("grupo", max_length=255, primary_key=True)
+    active = models.BooleanField("ativo", default=True)
+
     class Meta:
-        proxy = True
-        verbose_name_plural = '(WIP) Sumário de Mensagens'
+        verbose_name = "grupo"
+        verbose_name_plural = "grupos"
+        ordering = ["id"]
