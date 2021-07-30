@@ -125,4 +125,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TELEGRAM_API_ID = config("TELEGRAM_API_ID", cast=int)
 TELEGRAM_API_HASH = config("TELEGRAM_API_HASH")
-TELEGRAM_GROUPS = config("TELEGRAM_GROUPS", cast=Csv())
