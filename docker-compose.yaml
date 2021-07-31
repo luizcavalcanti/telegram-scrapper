@@ -7,8 +7,10 @@ services:
     command: >
       bash -c "
         source .env &&
-        pip install -r requirements.txt &&    
-        python manage.py runserver 0.0.0.0:8000
+        pip install gunicorn whitenoise &&
+        pip install -r requirements.txt &&
+        python manage.py collectstatic --noinput &&
+        gunicorn telegram_scrapper.wsgi -b :8000
       "
     ports:
       - 8002:8000
