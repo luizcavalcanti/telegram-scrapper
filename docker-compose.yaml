@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  telegram_scrapper:
+    image: python:3.9
+    working_dir: /telegram_scrapper
+    command: >
+      bash -c "
+        pip install -r requirements.txt &&    
+        python manage.py runserver 8002
+      "
+    environment:
+      - DEBUG
+      - DATABASE_URL
+      - ALLOWED_HOSTS
+      - SECRET_KEY
+      - TELEGRAM_API_ID
+      - TELEGRAM_API_HASH
+    volumes:
+      - .:/telegram_scrapper
