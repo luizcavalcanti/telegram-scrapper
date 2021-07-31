@@ -6,11 +6,12 @@ services:
     working_dir: /telegram_scrapper
     command: >
       bash -c "
+        source .env &&
         pip install -r requirements.txt &&    
-        python manage.py runserver 8002
+        python manage.py runserver 0.0.0.0:8000
       "
     ports:
-      - 8002:8002
+      - 8002:8000
     environment:
       - DEBUG
       - DATABASE_URL
