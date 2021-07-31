@@ -9,6 +9,8 @@ services:
         pip install -r requirements.txt &&    
         python manage.py runserver 8002
       "
+    ports:
+      - 8002:8002
     environment:
       - DEBUG
       - DATABASE_URL
@@ -18,3 +20,4 @@ services:
       - TELEGRAM_API_HASH
     volumes:
       - .:/telegram_scrapper
+    restart: always
