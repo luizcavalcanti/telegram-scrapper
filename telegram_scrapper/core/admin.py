@@ -15,3 +15,4 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'active')
+    list_editable = ['active']
