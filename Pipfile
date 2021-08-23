@@ -12,6 +12,7 @@ python-decouple = "*"
 telethon = "1.22"
 unidecode = "1.2"
 django-public-admin = "*"
+whitenoise = "*"
 
 [dev-packages]
 black = "==21.6b0"
