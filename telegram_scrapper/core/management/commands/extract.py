@@ -53,9 +53,10 @@ class Command(BaseCommand):
         for message in messages:
             try:
                 self.save_message(message, group)
+            except IntegrityError as e:
+                self.stderr.write(f"{e}")
             except Exception as e:  # TODO que erros esperamos aqui?
-                if "UNIQUE constraint failed" not in repr(e):
-                    raise CommandError(f"Erro baixando mensagens de {group}: {e}")
+                raise CommandError(f"Erro baixando mensagens de {group}: {e}")
 
     def save_message(self, message, group):
         obj = Message(
