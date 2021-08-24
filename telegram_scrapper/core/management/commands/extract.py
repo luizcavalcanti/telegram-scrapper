@@ -54,7 +54,7 @@ class Command(BaseCommand):
             try:
                 self.save_message(message, group)
             except IntegrityError as e:
-                self.stderr.write(f"{e}")
+                pass
             except Exception as e:  # TODO que erros esperamos aqui?
                 raise CommandError(f"Erro baixando mensagens de {group}: {e}")
 
