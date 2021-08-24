@@ -60,7 +60,7 @@ class Command(BaseCommand):
     def save_message(self, message, group):
         obj = Message(
             message_id=message.id,
-            message=message.message,
+            message=message.message if message.message else '',
             group=group,
             sender=self.get_sender(message),
             sent_at=message.date,
