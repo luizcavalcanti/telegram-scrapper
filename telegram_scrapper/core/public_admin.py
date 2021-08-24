@@ -7,7 +7,7 @@ from .models import Message
 class MessageModelAdmin(PublicModelAdmin):
     search_fields = ['message']
     list_display = (
-        'message_id',
+        'id',
         'group',
         'sender',
         'message',
