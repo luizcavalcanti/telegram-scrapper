@@ -97,4 +97,4 @@ class MessageModelAdmin(PublicModelAdmin):
 public_app = PublicApp("core", models=["Message", "TelegramUser"])
 public_admin = PublicAdminSite("dashboard", public_app)
 public_admin.register(Message, MessageModelAdmin)
-public_admin.register(TelegramUser, TelegramUserModelAdmin)
+# public_admin.register(TelegramUser, TelegramUserModelAdmin)
