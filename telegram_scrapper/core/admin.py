@@ -23,7 +23,7 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
     search_fields = ['user_id', 'username', 'first_name', 'last_name', 'phone']
-    list_display = ('user_id', 'username', 'full_name', 'verified')
+    list_display = ('user_id', 'username', 'full_name', 'phone', 'verified')
     ordering = ['user_id']
     list_filter = ['verified']
 
