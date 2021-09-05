@@ -24,6 +24,23 @@ class Message(models.Model):
         unique_together = ["message_id", "group"]
 
 
+class TelegramUser(models.Model):
+    user_id = models.BigIntegerField("ID do usuário", unique=True, primary_key=True)
+    username = models.CharField("Usuário", max_length=255, null=True)
+    first_name = models.CharField("Nome", max_length=255, null=True)
+    last_name = models.CharField("Sobrenome", max_length=255, null=True)
+    phone = models.CharField("Telefone", max_length=255, null=True)
+    photo = models.JSONField("Foto de perfil", default=dict, null=True)
+    fake = models.BooleanField("Falso", default=False)
+    deleted = models.BooleanField("Excluído", default=False)
+    verified = models.BooleanField("Verificado", default=False)
+
+    class Meta:
+        verbose_name = "Usuário"
+        verbose_name_plural = "Usuários"
+        indexes = [models.Index(fields=["user_id"]), models.Index(fields=["username"])]
+
+
 class Group(models.Model):
     id = models.CharField("grupo", max_length=255, primary_key=True)
     active = models.BooleanField("ativo", default=True)
