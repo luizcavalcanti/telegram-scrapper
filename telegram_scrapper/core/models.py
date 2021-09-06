@@ -14,6 +14,7 @@ class Message(models.Model):
     audio = models.JSONField("áudio", default=dict)
     document = models.JSONField("documento", default=dict)
     photo = models.JSONField("imagem", default=dict)
+    photo_url = models.CharField("URL da imagem", max_length=1024, null=True)
     forwarded = models.BooleanField("encaminhada", default=False)
 
     class Meta:
