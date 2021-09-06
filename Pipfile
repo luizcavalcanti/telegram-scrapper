@@ -13,6 +13,7 @@ telethon = "1.22"
 unidecode = "1.2"
 django-public-admin = "*"
 whitenoise = "*"
+boto3 = "*"
 
 [dev-packages]
 black = "==21.6b0"
