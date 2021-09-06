@@ -49,7 +49,7 @@ class MessageModelAdmin(PublicModelAdmin):
     list_display = (
         'id',
         'group',
-        'link_sender',
+        'sender_link',
         'message',
         'has_audio',
         'has_document',
@@ -57,14 +57,28 @@ class MessageModelAdmin(PublicModelAdmin):
         'has_video',
         'sent_at',
     )
+    fields = [
+        'id',
+        'message_id',
+        'group',
+        'sender_link',
+        'sent_at',
+        'forwarded',
+        'message',
+        'photo_tag',
+    ]
     ordering = ['-sent_at']
     list_filter = ['group']
 
     @mark_safe
-    def link_sender(self, obj):
+    def sender_link(self, obj):
         return (
-            f"<a href=\"/dashboard/core/telegramuser/{obj.sender}\" />{obj.sender}</a>"
+            f"<a href=\"/dashboard/core/telegramuser/{obj.sender}\" >{obj.sender}</a>"
         )
+
+    @mark_safe
+    def photo_tag(self, obj):
+        return f"<img src=\"{obj.photo_url}\" />"
 
     def has_audio(self, obj):
         return bool(obj.audio)
@@ -78,8 +92,11 @@ class MessageModelAdmin(PublicModelAdmin):
     def has_video(self, obj):
         return bool(obj.video)
 
-    link_sender.short_description = "Remetente"
-    link_sender.allow_tags = True
+    photo_tag.short_description = 'Imagem'
+    photo_tag.allow_tags = True
+
+    sender_link.short_description = "Remetente"
+    sender_link.allow_tags = True
 
     has_audio.boolean = True
     has_audio.short_description = "audio"

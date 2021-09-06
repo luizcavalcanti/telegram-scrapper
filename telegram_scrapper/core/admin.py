@@ -8,16 +8,16 @@ from .models import Message, Group, TelegramUser
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     search_fields = ['message']
-    list_display = ('message_id', 'group', 'link_sender', 'message', 'sent_at')
+    list_display = ('message_id', 'group', 'sender_link', 'message', 'sent_at')
     ordering = ['-sent_at']
     list_filter = ['group']
 
     @mark_safe
-    def link_sender(self, obj):
+    def sender_link(self, obj):
         return f"<a href=\"/admin/core/telegramuser/{obj.sender}\" />{obj.sender}</a>"
 
-    link_sender.short_description = "Remetente"
-    link_sender.allow_tags = True
+    sender_link.short_description = "Remetente"
+    sender_link.allow_tags = True
 
 
 @admin.register(TelegramUser)
