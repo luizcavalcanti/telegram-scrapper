@@ -21,6 +21,12 @@ services:
       - SECRET_KEY
       - TELEGRAM_API_ID
       - TELEGRAM_API_HASH
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_STORAGE_BUCKET_NAME
+      - AWS_S3_REGION_NAME
+      - AWS_S3_ENDPOINT_URL
+      - AWS_S3_PUBLIC_BASE_URL
     volumes:
       - .:/telegram_scrapper
     restart: always
