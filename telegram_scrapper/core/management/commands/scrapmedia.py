@@ -1,14 +1,11 @@
+import boto3
+import hashlib
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from telethon import TelegramClient, sync
 from telethon.tl.types import InputMessagesFilterPhotos
-
-# from telethon.tl.custom.file import File
-# from telethon.tl.custom.message import Message as TMessage
 from telegram_scrapper.core.models import Message, Group
-
-import json
-import boto3
 
 
 class Command(BaseCommand):
@@ -63,21 +60,20 @@ class Command(BaseCommand):
             ).first()
 
             if self._should_download_photo(local_message):
-                file_name = f"{msg.photo.id}.jpg"
-                self._upload_photo(msg.photo, file_name)
-                local_message.photo_url = f"{self.s3_base_public_url}/{file_name}"
+                local_message.photo_url = self._upload_photo(msg.photo)
                 local_message.save()
-                self.stdout.write(
-                    "Updated photo url for"
-                    f" {group}: {local_message.message_id} ({msg.photo.id})"
-                )
+                self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
 
     def _should_download_photo(self, message):
         return message and not message.photo_url
 
-    def _upload_photo(self, media, file_name):
+    def _upload_photo(self, media):
         file_bytes = self.telegram_client.download_media(media, file=bytes)
 
+        file_hash = hashlib.md5()
+        file_hash.update(file_bytes)
+
+        file_name = f"{file_hash.hexdigest()}.jpg"
         self.s3_client.put_object(
             Body=file_bytes,
             Bucket=f"{settings.AWS_STORAGE_BUCKET_NAME}",
@@ -85,3 +81,5 @@ class Command(BaseCommand):
             ACL='public-read',
             CacheControl='max-age=31556926',
         )
+
+        return f"{self.s3_base_public_url}/{file_name}"
