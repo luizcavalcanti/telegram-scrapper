@@ -66,6 +66,7 @@ class MessageModelAdmin(PublicModelAdmin):
         'forwarded',
         'message',
         'photo_tag',
+        'audio_tag',
     ]
     ordering = ['-sent_at']
     list_filter = ['group']
@@ -78,7 +79,17 @@ class MessageModelAdmin(PublicModelAdmin):
 
     @mark_safe
     def photo_tag(self, obj):
-        return f"<img src=\"{obj.photo_url}\" />"
+        return f"<img src=\"{obj.photo_url}\" />" if obj.photo_url else "-"
+
+    @mark_safe
+    def audio_tag(self, obj):
+        return (
+            "<audio controls preload=\"metadata\" style=\" width:300px;\"><source"
+            f" src=\"{obj.audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
+            f" acesse {obj.audio_url}.</audio>"
+            if obj.audio_url
+            else "-"
+        )
 
     def has_audio(self, obj):
         return bool(obj.audio)
@@ -94,6 +105,9 @@ class MessageModelAdmin(PublicModelAdmin):
 
     photo_tag.short_description = 'Imagem'
     photo_tag.allow_tags = True
+
+    audio_tag.short_description = 'Audio'
+    audio_tag.allow_tags = True
 
     sender_link.short_description = "Remetente"
     sender_link.allow_tags = True
