@@ -15,6 +15,7 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         'is_fake',
         'is_deleted',
     )
+    fields = ['user_id', 'username', 'full_name']
     exclude = ['phone']
     ordering = ['user_id', 'username']
     list_filter = ['verified', 'deleted', 'fake']
@@ -128,4 +129,4 @@ class MessageModelAdmin(PublicModelAdmin):
 public_app = PublicApp("core", models=["Message", "TelegramUser"])
 public_admin = PublicAdminSite("dashboard", public_app)
 public_admin.register(Message, MessageModelAdmin)
-# public_admin.register(TelegramUser, TelegramUserModelAdmin)
+public_admin.register(TelegramUser, TelegramUserModelAdmin)
