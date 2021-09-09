@@ -12,6 +12,7 @@ class Message(models.Model):
     message = models.TextField("mensagem")
     video = models.JSONField("vídeo", default=dict)
     audio = models.JSONField("áudio", default=dict)
+    audio_url = models.CharField("URL do áudio", max_length=1024, null=True)
     document = models.JSONField("documento", default=dict)
     photo = models.JSONField("imagem", default=dict)
     photo_url = models.CharField("URL da imagem", max_length=1024, null=True)
