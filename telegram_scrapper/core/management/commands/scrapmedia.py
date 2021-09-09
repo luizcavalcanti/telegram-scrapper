@@ -4,7 +4,7 @@ import hashlib
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from telethon import TelegramClient, sync
-from telethon.tl.types import InputMessagesFilterPhotos
+from telethon.tl.types import InputMessagesFilterPhotos, InputMessagesFilterMusic
 from telegram_scrapper.core.models import Message, Group
 
 
@@ -50,6 +50,10 @@ class Command(BaseCommand):
             self._download_media_for_group(group.id, limit)
 
     def _download_media_for_group(self, group, limit):
+        self._download_photos_for_group(group, limit)
+        self._download_music_for_group(group, limit)
+
+    def _download_photos_for_group(self, group, limit):
         photo_messages = self.telegram_client.get_messages(
             group, limit, filter=InputMessagesFilterPhotos
         )
@@ -60,20 +64,38 @@ class Command(BaseCommand):
             ).first()
 
             if self._should_download_photo(local_message):
-                local_message.photo_url = self._upload_photo(msg.photo)
+                local_message.photo_url = self._upload_media(msg.photo, "jpg")
                 local_message.save()
                 self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
+
+    def _download_music_for_group(self, group, limit):
+        audio_messages = self.telegram_client.get_messages(
+            group, limit, filter=InputMessagesFilterMusic
+        )
+
+        for msg in audio_messages:
+            local_message = Message.objects.filter(
+                message_id=msg.id, group=group
+            ).first()
+
+            if self._should_download_audio(local_message):
+                local_message.audio_url = self._upload_media(msg.audio, "mp3")
+                local_message.save()
+                self.stdout.write(f"[{group}] Uploaded {local_message.audio_url}")
 
     def _should_download_photo(self, message):
         return message and not message.photo_url
 
-    def _upload_photo(self, media):
+    def _should_download_audio(self, message):
+        return message and not message.audio_url
+
+    def _upload_media(self, media, extension):
         file_bytes = self.telegram_client.download_media(media, file=bytes)
 
         file_hash = hashlib.md5()
         file_hash.update(file_bytes)
 
-        file_name = f"{file_hash.hexdigest()}.jpg"
+        file_name = f"{file_hash.hexdigest()}.{extension}"
         self.s3_client.put_object(
             Body=file_bytes,
             Bucket=f"{settings.AWS_STORAGE_BUCKET_NAME}",
