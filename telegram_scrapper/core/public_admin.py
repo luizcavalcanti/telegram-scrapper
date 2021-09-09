@@ -1,3 +1,5 @@
+from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.db.models import F
 from django.utils.safestring import mark_safe
 from public_admin.admin import PublicModelAdmin
 from public_admin.sites import PublicAdminSite, PublicApp
@@ -70,6 +72,20 @@ class MessageModelAdmin(PublicModelAdmin):
     ]
     ordering = ['-sent_at']
     list_filter = ['group']
+
+    def get_search_results(self, request, queryset, search_term):
+        if not search_term:
+            return super(MessageModelAdmin, self).get_search_results(
+                request, queryset, search_term
+            )
+
+        query = SearchQuery(search_term, config="portuguese")
+        queryset = (
+            Message.objects.annotate(rank=SearchRank(F("search_vector"), query))
+            .filter(search_vector=query)
+            .order_by("-rank")
+        )
+        return queryset, False
 
     @mark_safe
     def sender_link(self, obj):
