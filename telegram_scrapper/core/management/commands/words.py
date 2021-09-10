@@ -56,8 +56,17 @@ STOPWORDS = [
 class Command(BaseCommand):
     help = "Generate a dataset with words frequency by date"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "term", type=str, help="Termo a ser contabilizado", default=None
+        )
+
     def handle(self, *args, **options):
-        words = self.generate_word_frequency()
+        term = options["term"]
+        if term:
+            words = self._generate_single_term_frequency(term)
+        else:
+            words = self._generate_word_frequency()
 
         self.stdout.write(f"{len(words)} unique words found")
 
@@ -67,7 +76,27 @@ class Command(BaseCommand):
         f.close()
         self.stdout.write(self.style.SUCCESS("done"))
 
-    def generate_word_frequency(self):
+    def _generate_single_term_frequency(self, term):
+        words = {}
+
+        sanitized_term = self.sanitize(term)
+        words[sanitized_term] = {}
+
+        messages = Message.objects.exclude(message='')
+
+        for message in messages:
+            pieces = re.split(r"[\s]", message.message)
+            date = f"{message.sent_at:%Y-%m-%d}"
+
+            for word in pieces:
+                sanitized_word = self.sanitize(word)
+                if sanitized_word == sanitized_term:
+                    self.stdout.write(f"FOUND: {pieces}")
+                    words[sanitized_term][date] = words[sanitized_term].get(date, 0) + 1
+
+        return words
+
+    def _generate_word_frequency(self):
         words = {}
 
         self.stdout.write("Fetching all text messages")
@@ -95,6 +124,7 @@ class Command(BaseCommand):
         word = re.sub(r"[íï]", 'i', word)
         word = re.sub(r"[õóôö]", 'o', word)
         word = re.sub(r"[úûü']", 'u', word)
+        word = re.sub(r"[^\w]", '', word)
         return re.sub(SANITIZIATION_PATTERN, '', word)
 
     def is_stopword(self, word):
