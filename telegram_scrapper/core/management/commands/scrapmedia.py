@@ -7,6 +7,8 @@ from telethon import TelegramClient, sync
 from telethon.tl.types import InputMessagesFilterPhotos, InputMessagesFilterMusic
 from telegram_scrapper.core.models import Message, Group
 
+MAX_MEDIA_SIZE = 200 * 1024 * 1024  # 200MB
+
 
 class Command(BaseCommand):
     help = "Scrap Telegram media from saved messages"
@@ -80,6 +82,13 @@ class Command(BaseCommand):
             ).first()
 
             if self._should_download_audio(local_message):
+                if msg.audio.size > MAX_MEDIA_SIZE:
+                    self.stdout.write(
+                        f"[{group}] Skipping media for {local_message.id}. Too large"
+                        f" ({msg.audio.size}b)"
+                    )
+                    continue
+
                 self.stdout.write(f"[{group}] Downloading media for {local_message.id}")
                 local_message.audio_url = self._upload_media(msg.audio, "mp3")
                 local_message.save()
