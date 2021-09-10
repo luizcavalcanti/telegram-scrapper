@@ -14,6 +14,7 @@ unidecode = "1.2"
 django-public-admin = "*"
 whitenoise = "*"
 boto3 = "*"
+gunicorn = "*"
 
 [dev-packages]
 black = "==21.6b0"
