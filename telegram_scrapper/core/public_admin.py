@@ -46,6 +46,8 @@ class TelegramUserModelAdmin(PublicModelAdmin):
 
 
 class MessageModelAdmin(PublicModelAdmin):
+    PROCESSING_MESSAGE = "Processando, volte mais tarde."
+
     search_fields = ['message']
     list_display = (
         'id',
@@ -80,15 +82,27 @@ class MessageModelAdmin(PublicModelAdmin):
 
     @mark_safe
     def photo_tag(self, obj):
-        return f"<img src=\"{obj.photo_url}\" />" if obj.photo_url else "-"
+        return (
+            (
+                f"<img src=\"{obj.photo_url}\" />"
+                if obj.photo_url
+                else self.PROCESSING_MESSAGE
+            )
+            if self.has_image(obj)
+            else "-"
+        )
 
     @mark_safe
     def audio_tag(self, obj):
         return (
-            "<audio controls preload=\"metadata\" style=\" width:300px;\"><source"
-            f" src=\"{obj.audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
-            f" acesse {obj.audio_url}.</audio>"
-            if obj.audio_url
+            (
+                "<audio controls preload=\"metadata\" style=\" width:300px;\"><source"
+                f" src=\"{obj.audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
+                f" acesse {obj.audio_url}.</audio>"
+                if obj.audio_url
+                else self.PROCESSING_MESSAGE
+            )
+            if self.has_audio(obj)
             else "-"
         )
 
