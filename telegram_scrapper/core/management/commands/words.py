@@ -85,7 +85,7 @@ class Command(BaseCommand):
         self.stdout.write("Fetching all text messages")
         messages = Message.objects.exclude(message='')
 
-        for message in messages.iterator(chunk_size=100):
+        for message in messages.iterator():
             pieces = re.split(r"[\s]", message.message)
             date = f"{message.sent_at:%Y-%m-%d}"
 
@@ -102,7 +102,7 @@ class Command(BaseCommand):
         self.stdout.write("Fetching all text messages")
         messages = Message.objects.exclude(message='')
 
-        for message in messages.iterator(100):
+        for message in messages.iterator():
             pieces = re.split(r"[\s]", message.message)
             date = f"{message.sent_at:%Y-%m-%d}"
 
