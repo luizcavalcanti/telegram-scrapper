@@ -82,16 +82,17 @@ class Command(BaseCommand):
         sanitized_term = self.sanitize(term)
         words[sanitized_term] = {}
 
+        self.stdout.write("Fetching all text messages")
         messages = Message.objects.exclude(message='')
+        self.stdout.write(f"{len(messages)} messages found")
 
-        for message in messages:
+        for message in messages.iterator():
             pieces = re.split(r"[\s]", message.message)
             date = f"{message.sent_at:%Y-%m-%d}"
 
             for word in pieces:
                 sanitized_word = self.sanitize(word)
                 if sanitized_word == sanitized_term:
-                    self.stdout.write(f"FOUND: {pieces}")
                     words[sanitized_term][date] = words[sanitized_term].get(date, 0) + 1
 
         return words
