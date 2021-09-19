@@ -9,6 +9,7 @@ from telethon.tl.types import (
     InputMessagesFilterMusic,
     InputMessagesFilterPhotos,
     InputMessagesFilterPhotoVideo,
+    InputMessagesFilterUrl,
 )
 from telegram_scrapper.core.models import Message, Group
 
@@ -57,9 +58,16 @@ class Command(BaseCommand):
             self._download_media_for_group(group.id, limit)
 
     def _download_media_for_group(self, group, limit):
-        self._download_images_for_group(InputMessagesFilterPhotos, group, limit)
-        self._download_images_for_group(InputMessagesFilterPhotoVideo, group, limit)
-        self._download_images_for_group(InputMessagesFilterChatPhotos, group, limit)
+        image_filters = [
+            InputMessagesFilterPhotos,
+            InputMessagesFilterPhotoVideo,
+            InputMessagesFilterChatPhotos,
+            InputMessagesFilterUrl,
+        ]
+
+        for media_filter in image_filters:
+            self._download_images_for_group(media_filter, group, limit)
+
         self._download_music_for_group(group, limit)
 
     def _download_images_for_group(self, media_filter, group, limit):
