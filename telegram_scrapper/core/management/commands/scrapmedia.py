@@ -89,10 +89,15 @@ class Command(BaseCommand):
                     )
                     continue
 
-                self.stdout.write(f"[{group}] Downloading media for {local_message.id}")
-                local_message.audio_url = self._upload_media(msg.audio, "mp3")
-                local_message.save()
-                self.stdout.write(f"[{group}] Uploaded {local_message.audio_url}")
+                try:
+                    self.stdout.write(
+                        f"[{group}] Downloading media for {local_message.id}"
+                    )
+                    local_message.audio_url = self._upload_media(msg.audio, "mp3")
+                    local_message.save()
+                    self.stdout.write(f"[{group}] Uploaded {local_message.audio_url}")
+                except Exception as e:
+                    self.stderr.write(f"Untreated error: {e}")
 
     def _should_download_photo(self, message):
         return message and not message.photo_url
