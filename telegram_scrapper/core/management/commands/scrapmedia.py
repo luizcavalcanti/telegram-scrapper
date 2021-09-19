@@ -113,7 +113,7 @@ class Command(BaseCommand):
     def _upload_media(self, media, extension):
         file_bytes = self.telegram_client.download_media(media, file=bytes)
 
-        file_hash = hashlib.md5(new.encode())
+        file_hash = hashlib.md5()
         file_hash.update(file_bytes)
 
         file_name = f"{file_hash.hexdigest()}.{extension}"
