@@ -7,7 +7,7 @@ from telethon import TelegramClient, sync
 from telethon.tl.types import InputMessagesFilterPhotos, InputMessagesFilterMusic
 from telegram_scrapper.core.models import Message, Group
 
-MAX_MEDIA_SIZE = 200 * 1024 * 1024  # 200MB
+MAX_MEDIA_SIZE = 250 * 1024 * 1024  # 250MB
 
 
 class Command(BaseCommand):
@@ -66,10 +66,15 @@ class Command(BaseCommand):
             ).first()
 
             if self._should_download_photo(local_message):
-                self.stdout.write(f"[{group}] Downloading media for {local_message.id}")
-                local_message.photo_url = self._upload_media(msg.photo, "jpg")
-                local_message.save()
-                self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
+                try:
+                    self.stdout.write(
+                        f"[{group}] Downloading media for {local_message.id}"
+                    )
+                    local_message.photo_url = self._upload_media(msg.photo, "jpg")
+                    local_message.save()
+                    self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
+                except Exception as e:
+                    self.stderr.write(f"Untreated error: {e}")
 
     def _download_music_for_group(self, group, limit):
         audio_messages = self.telegram_client.get_messages(
@@ -108,7 +113,7 @@ class Command(BaseCommand):
     def _upload_media(self, media, extension):
         file_bytes = self.telegram_client.download_media(media, file=bytes)
 
-        file_hash = hashlib.md5()
+        file_hash = hashlib.md5(new.encode())
         file_hash.update(file_bytes)
 
         file_name = f"{file_hash.hexdigest()}.{extension}"
