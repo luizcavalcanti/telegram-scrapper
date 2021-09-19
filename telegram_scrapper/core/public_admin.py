@@ -2,7 +2,7 @@ from django.utils.safestring import mark_safe
 from public_admin.admin import PublicModelAdmin
 from public_admin.sites import PublicAdminSite, PublicApp
 
-from .models import Message, TelegramUser
+from .models import Message, TelegramUser, Group
 
 
 class TelegramUserModelAdmin(PublicModelAdmin):
@@ -43,6 +43,17 @@ class TelegramUserModelAdmin(PublicModelAdmin):
 
     is_deleted.boolean = True
     is_deleted.short_description = "Excluído"
+
+
+class GroupModelAdmin(PublicModelAdmin):
+    search_fields = ['id']
+    list_display = ('id', 'total_messages', 'active')
+    fields = ['id', 'total_messages', 'active']
+
+    def total_messages(self, obj):
+        return Message.objects.filter(group=obj.id).count()
+
+    total_messages.short_description = 'Mensagens armazenadas'
 
 
 class MessageModelAdmin(PublicModelAdmin):
@@ -140,7 +151,8 @@ class MessageModelAdmin(PublicModelAdmin):
     has_video.short_description = "video"
 
 
-public_app = PublicApp("core", models=["Message", "TelegramUser"])
+public_app = PublicApp("core", models=["Message", "TelegramUser", "Group"])
 public_admin = PublicAdminSite("dashboard", public_app)
 public_admin.register(Message, MessageModelAdmin)
 public_admin.register(TelegramUser, TelegramUserModelAdmin)
+public_admin.register(Group, GroupModelAdmin)
