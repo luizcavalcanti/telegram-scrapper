@@ -74,7 +74,7 @@ class Command(BaseCommand):
                     local_message.save()
                     self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
                 except Exception as e:
-                    self.stderr.write(f"Untreated error: {e}")
+                    self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
 
     def _download_music_for_group(self, group, limit):
         audio_messages = self.telegram_client.get_messages(
@@ -102,13 +102,13 @@ class Command(BaseCommand):
                     local_message.save()
                     self.stdout.write(f"[{group}] Uploaded {local_message.audio_url}")
                 except Exception as e:
-                    self.stderr.write(f"Untreated error: {e}")
+                    self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
 
     def _should_download_photo(self, message):
-        return message and not message.photo_url
+        return message and not bool(message.photo_url)
 
     def _should_download_audio(self, message):
-        return message and not message.audio_url
+        return message and not bool(message.audio_url)
 
     def _upload_media(self, media, extension):
         file_bytes = self.telegram_client.download_media(media, file=bytes)
