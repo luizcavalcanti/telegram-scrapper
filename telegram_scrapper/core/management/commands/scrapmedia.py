@@ -4,7 +4,12 @@ import hashlib
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from telethon import TelegramClient, sync
-from telethon.tl.types import InputMessagesFilterPhotos, InputMessagesFilterMusic
+from telethon.tl.types import (
+    InputMessagesFilterChatPhotos,
+    InputMessagesFilterMusic,
+    InputMessagesFilterPhotos,
+    InputMessagesFilterPhotoVideo,
+)
 from telegram_scrapper.core.models import Message, Group
 
 MAX_MEDIA_SIZE = 250 * 1024 * 1024  # 250MB
@@ -52,29 +57,36 @@ class Command(BaseCommand):
             self._download_media_for_group(group.id, limit)
 
     def _download_media_for_group(self, group, limit):
-        self._download_photos_for_group(group, limit)
+        self._download_images_for_group(InputMessagesFilterPhotos, group, limit)
+        self._download_images_for_group(InputMessagesFilterPhotoVideo, group, limit)
+        self._download_images_for_group(InputMessagesFilterChatPhotos, group, limit)
         self._download_music_for_group(group, limit)
 
-    def _download_photos_for_group(self, group, limit):
-        photo_messages = self.telegram_client.get_messages(
-            group, limit, filter=InputMessagesFilterPhotos
+    def _download_images_for_group(self, media_filter, group, limit):
+        image_messages = self.telegram_client.get_messages(
+            group, limit, filter=media_filter
         )
+        for message in image_messages:
+            self._download_image(message, group)
 
-        for msg in photo_messages:
-            local_message = Message.objects.filter(
-                message_id=msg.id, group=group
-            ).first()
+    def _download_image(self, message, group):
+        local_message = Message.objects.filter(
+            message_id=message.id, group=group
+        ).first()
 
-            if self._should_download_photo(local_message):
-                try:
-                    self.stdout.write(
-                        f"[{group}] Downloading media for {local_message.id}"
-                    )
-                    local_message.photo_url = self._upload_media(msg.photo, "jpg")
-                    local_message.save()
-                    self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
+        media = message.photo if message.photo else None
+
+        if media and self._should_download_image(local_message):
+            try:
+                self.stdout.write(f"[{group}] Downloading media for {local_message.id}")
+                local_message.photo_url = self._upload_media(media, message.file.ext)
+                local_message.save()
+                self.stdout.write(f"[{group}] Uploaded {local_message.photo_url}")
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
+
+    def _should_download_image(self, message):
+        return message and not bool(message.photo_url)
 
     def _download_music_for_group(self, group, limit):
         audio_messages = self.telegram_client.get_messages(
@@ -98,25 +110,25 @@ class Command(BaseCommand):
                     self.stdout.write(
                         f"[{group}] Downloading media for {local_message.id}"
                     )
-                    local_message.audio_url = self._upload_media(msg.audio, "mp3")
+                    local_message.audio_url = self._upload_media(msg.audio, ".mp3")
                     local_message.save()
                     self.stdout.write(f"[{group}] Uploaded {local_message.audio_url}")
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
 
-    def _should_download_photo(self, message):
-        return message and not bool(message.photo_url)
-
     def _should_download_audio(self, message):
         return message and not bool(message.audio_url)
 
     def _upload_media(self, media, extension):
+        if not extension:
+            raise CommandError(f"Media has no extension")
+
         file_bytes = self.telegram_client.download_media(media, file=bytes)
 
         file_hash = hashlib.md5()
         file_hash.update(file_bytes)
 
-        file_name = f"{file_hash.hexdigest()}.{extension}"
+        file_name = f"{file_hash.hexdigest()}{extension}"
         self.s3_client.put_object(
             Body=file_bytes,
             Bucket=f"{settings.AWS_STORAGE_BUCKET_NAME}",
