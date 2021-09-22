@@ -61,7 +61,7 @@ ROOT_URLCONF = "telegram_scrapper.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'telegram_scrapper/templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

@@ -1,0 +1,10 @@
+<script src="https://d3js.org/d3.v6.js"></script>
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content-main">
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+  {% include "admin/graph_messages_per_day.html" %}
+</div>
+{% endblock %}
