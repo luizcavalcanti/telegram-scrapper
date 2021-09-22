@@ -38,3 +38,6 @@ class TelegramUserAdmin(admin.ModelAdmin):
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'active')
     list_editable = ['active']
+
+
+admin.site.site_header = "Telegram Scrapper"
