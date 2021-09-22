@@ -32,7 +32,9 @@ def top_images(request):
     start_date = datetime.today() - timedelta(days=past_days)
     end_date = datetime.today()
     data = (
-        Message.objects.filter(sent_at__range=[start_date.date(), end_date.date()])
+        Message.objects.filter(
+            sent_at__range=[start_date.date(), end_date.date()], video={}, document={}
+        )
         .annotate(count=Count('photo_url'))
         .order_by('-count')
         .values('photo_url')
