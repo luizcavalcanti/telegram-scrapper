@@ -156,3 +156,7 @@ public_admin = PublicAdminSite("dashboard", public_app)
 public_admin.register(Message, MessageModelAdmin)
 public_admin.register(TelegramUser, TelegramUserModelAdmin)
 public_admin.register(Group, GroupModelAdmin)
+
+public_admin.site_header = "Telegram Scrapper"
+public_admin.site_title = "Telegram Scrapper"
+public_admin.index_title = "Dados"
