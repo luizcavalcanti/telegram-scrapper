@@ -13,9 +13,9 @@ _DEFAULT_DAYS = 30
 def messages_per_day(request):
     past_days = int(request.GET.get('days', _DEFAULT_DAYS))
     start_date = datetime.today() - timedelta(days=past_days)
-    end_date = datetime.today() - timedelta(days=1)
+    end_date = datetime.today()
     data = (
-        Message.objects.filter(sent_at__range=[start_date, end_date])
+        Message.objects.filter(sent_at__range=[start_date.date(), end_date.date()])
         .annotate(date=TruncDate('sent_at'))
         .order_by('date')
         .values('date')
