@@ -15,6 +15,7 @@ django-public-admin = "*"
 whitenoise = "*"
 boto3 = "*"
 gunicorn = "*"
+psycopg2 = "*"
 
 [dev-packages]
 black = "==21.6b0"
