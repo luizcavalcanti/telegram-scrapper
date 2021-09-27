@@ -1,7 +1,7 @@
 <div class="graph">
-	<h3>Imagens mais frequentes</h3>
+	<h3>Usuários que mais postam</h3>
 	Período:
-	<select id="top_images_param_days" type="select" onchange="loadData();">
+	<select id="top_users_param_days" type="select" onchange="loadTopUsersData();">
 		<option value="7">7 dias</option>
 		<option value="15">15 dias</option>
 		<option value="30" selected="true">30 dias</option>
@@ -11,16 +11,16 @@
 		<option value="180">180 dias</option>
 		<option value="365">365 dias</option>
 	</select>
-	<div id="top_images"></div>
+	<div id="top_users"></div>
 </div>
 <script type="text/javascript">
-var loadData = function() {
-	days = document.getElementById("top_images_param_days").value;
+var loadTopUsersData = function() {
+	days = document.getElementById("top_users_param_days").value;
 
-	d3.json('/api/top_images?days='+days).then((data) => {
-		columns = ['Imagem', 'Ocorrências']
+	d3.json('/api/top_users?limit=5&days='+days).then((data) => {
+		columns = ['Usuário', 'Mensagens']
 		
-		var div = d3.select('#top_images')
+		var div = d3.select('#top_users')
 		div.selectAll("*").remove();
 		var table = div.append('table')
 		var thead = table.append('thead')
@@ -39,11 +39,18 @@ var loadData = function() {
 
 		rows.append('td')
 			.append('a')
-				.attr('href', function(d) { return d.photo_url })
-				.attr('target', '_blank')
-		  		.append('img')
-		  			.attr('src', function(d) { return d.photo_url })
-		  			.attr('style', 'max-width: 100px');
+				.attr('href', function(d) { return 'core/telegramuser/'+ d.sender +'/change/' })
+			.append('span')
+			.text(function(d) { 
+				console.log(d)
+				if (d.user)
+					return (d.user.first_name ? d.user.first_name+' ' : '') + 
+						(d.user.last_name ? d.user.last_name : '') + 
+						(d.user.username ? ' ('+d.user.username+')' : '')
+				else
+					return d.sender 
+			})
+			
 
 		rows.append('td')
 		  	.text(function(d) { return d.total });
@@ -53,5 +60,5 @@ var loadData = function() {
 	});
 }
 
-loadData();
+loadTopUsersData();
 </script>
