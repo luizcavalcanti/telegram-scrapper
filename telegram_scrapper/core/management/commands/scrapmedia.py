@@ -15,6 +15,13 @@ from telegram_scrapper.core.models import Message, Group
 
 MAX_MEDIA_SIZE = 250 * 1024 * 1024  # 250MB
 
+extension_to_mime = {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.mp3': 'audio/mpeg',
+}
+
 
 class Command(BaseCommand):
     help = "Scrap Telegram media from saved messages"
@@ -137,12 +144,15 @@ class Command(BaseCommand):
         file_hash.update(file_bytes)
 
         file_name = f"{file_hash.hexdigest()}{extension}"
+        mime_type = extension_to_mime.get(extension, 'binary/octet-stream')
+
         self.s3_client.put_object(
             Body=file_bytes,
             Bucket=f"{settings.AWS_STORAGE_BUCKET_NAME}",
             Key=file_name,
             ACL='public-read',
             CacheControl='max-age=31556926',
+            ContentType=mime_type,
         )
 
         return f"{self.s3_base_public_url}/{file_name}"
