@@ -5,6 +5,36 @@ from public_admin.sites import PublicAdminSite, PublicApp
 from .models import Message, TelegramUser, Group
 
 
+# TODO: refatorar
+def get_message_as_html(msg):
+    header = (
+        f"<a href='/dashboard/core/message/{msg.id}'>&gt;&gt;</a> [{msg.group}] "
+        f" {msg.sent_at.strftime('%d/%m/%Y %H:%M:%S')}"
+    )
+    html_output = (
+        f"<img style='max-height: 200px; margin: 3px' src='{msg.photo_url}'>"
+        if msg.photo_url
+        else ''
+    )
+    html_output += f"<audio src='{msg.audio_url}'>" if msg.audio_url else ''
+    html_output += ' ' + msg.message if msg.message else ''
+    html_output += (
+        '<span style="color: red;">(video ainda não é suportado)</span>'
+        if msg.video
+        else ''
+    )
+    html_output += (
+        '<span style="color: red;">(documento ainda não é suportado)</span>'
+        if msg.document
+        else ''
+    )
+
+    if html_output == '':
+        return f"{header} - {str(msg.video)}"
+
+    return f"{header} - {html_output}"
+
+
 class TelegramUserModelAdmin(PublicModelAdmin):
     search_fields = ['user_id', 'username', 'first_name', 'last_name']
     list_display = (
@@ -15,7 +45,14 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         'is_fake',
         'is_deleted',
     )
-    fields = ['user_id', 'username', 'full_name']
+    fields = [
+        'user_id',
+        'username',
+        'full_name',
+        'total_messages',
+        'groups',
+        'last_messages',
+    ]
     exclude = ['phone']
     ordering = ['user_id', 'username']
     list_filter = ['verified', 'deleted', 'fake']
@@ -24,6 +61,29 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         return (
             f"{obj.first_name if obj.first_name else ''}"
             f" {obj.last_name if obj.last_name else ''}"
+        )
+
+    def total_messages(self, obj):
+        return Message.objects.filter(sender=obj.user_id).count()
+
+    def groups(self, obj):
+        return ', '.join(
+            map(
+                lambda m: m['group'],
+                Message.objects.filter(sender=obj.user_id)
+                .values('group')
+                .distinct('group')
+                .order_by('group'),
+            )
+        )
+
+    @mark_safe
+    def last_messages(self, obj):
+        return '<br>'.join(
+            map(
+                lambda m: get_message_as_html(m),
+                Message.objects.filter(sender=obj.user_id).order_by('-sent_at')[:10],
+            )
         )
 
     def is_verified(self, obj):
@@ -36,13 +96,16 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         return bool(obj.deleted)
 
     is_verified.boolean = True
-    is_verified.short_description = "Verificado"
-
     is_fake.boolean = True
-    is_fake.short_description = "Fake"
-
     is_deleted.boolean = True
+
+    is_verified.short_description = "Verificado"
+    is_fake.short_description = "Fake"
     is_deleted.short_description = "Excluído"
+    full_name.short_description = "Nome"
+    total_messages.short_description = "Mensagens postadas"
+    last_messages.short_description = "Últimas mensagens"
+    groups.short_description = "Grupos"
 
 
 class GroupModelAdmin(PublicModelAdmin):
