@@ -1,21 +1,29 @@
-<div class="graph">
-	<h3>Usuários que mais postam</h3>
-	Período:
-	<select id="top_users_param_days" type="select" onchange="loadTopUsersData();">
-		<option value="7">7 dias</option>
-		<option value="15">15 dias</option>
-		<option value="30" selected="true">30 dias</option>
-		<option value="60">60 dias</option>
-		<option value="90">90 dias</option>
-		<option value="120">120 dias</option>
-		<option value="180">180 dias</option>
-		<option value="365">365 dias</option>
-	</select>
+<div class="dashpanel">
+	<div class="header">Usuários que mais postam</div>
+	<div class="filter">
+		Período:
+		<select id="top_users_param_days" type="select" onchange="loadTopUsersData();">
+			<option value="7">7 dias</option>
+			<option value="15">15 dias</option>
+			<option value="30" selected="true">30 dias</option>
+			<option value="60">60 dias</option>
+			<option value="90">90 dias</option>
+			<option value="120">120 dias</option>
+			<option value="180">180 dias</option>
+			<option value="365">365 dias</option>
+		</select>
+	</div>
 	<div id="top_users"></div>
 </div>
 <script type="text/javascript">
 var loadTopUsersData = function() {
+	container = document.getElementById("top_users").parentNode;
 	days = document.getElementById("top_users_param_days").value;
+
+	container = document.getElementById("total_messages").parentNode;
+
+	margin = {top: 10, right: 30, bottom: 30, left: 60},
+	height = 300 - margin.top - margin.bottom;
 
 	d3.json('/api/top_users?limit=5&days='+days).then((data) => {
 		columns = ['Usuário', 'Mensagens']
@@ -25,6 +33,8 @@ var loadTopUsersData = function() {
 		var table = div.append('table')
 		var thead = table.append('thead')
 		var	tbody = table.append('tbody');
+
+		table.attr("style", "width: "+(container.clientWidth - 5)+"px;");
 
 		thead.append('tr')
 		  .selectAll('th')
