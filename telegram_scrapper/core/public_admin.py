@@ -4,7 +4,37 @@ from django.utils.safestring import mark_safe
 from public_admin.admin import PublicModelAdmin
 from public_admin.sites import PublicAdminSite, PublicApp
 
-from .models import Message, TelegramUser
+from .models import Message, TelegramUser, Group
+
+
+# TODO: refatorar
+def get_message_as_html(msg):
+    header = (
+        f"<a href='/dashboard/core/message/{msg.id}'>&gt;&gt;</a> [{msg.group}] "
+        f" {msg.sent_at.strftime('%d/%m/%Y %H:%M:%S')}"
+    )
+    html_output = (
+        f"<img style='max-height: 200px; margin: 3px' src='{msg.photo_url}'>"
+        if msg.photo_url
+        else ''
+    )
+    html_output += f"<audio src='{msg.audio_url}'>" if msg.audio_url else ''
+    html_output += ' ' + msg.message if msg.message else ''
+    html_output += (
+        '<span style="color: red;">(video ainda não é suportado)</span>'
+        if msg.video
+        else ''
+    )
+    html_output += (
+        '<span style="color: red;">(documento ainda não é suportado)</span>'
+        if msg.document
+        else ''
+    )
+
+    if html_output == '':
+        return f"{header} - {str(msg.video)}"
+
+    return f"{header} - {html_output}"
 
 
 class TelegramUserModelAdmin(PublicModelAdmin):
@@ -17,6 +47,14 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         'is_fake',
         'is_deleted',
     )
+    fields = [
+        'user_id',
+        'username',
+        'full_name',
+        'total_messages',
+        'groups',
+        'last_messages',
+    ]
     exclude = ['phone']
     ordering = ['user_id', 'username']
     list_filter = ['verified', 'deleted', 'fake']
@@ -25,6 +63,29 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         return (
             f"{obj.first_name if obj.first_name else ''}"
             f" {obj.last_name if obj.last_name else ''}"
+        )
+
+    def total_messages(self, obj):
+        return Message.objects.filter(sender=obj.user_id).count()
+
+    def groups(self, obj):
+        return ', '.join(
+            map(
+                lambda m: m['group'],
+                Message.objects.filter(sender=obj.user_id)
+                .values('group')
+                .distinct('group')
+                .order_by('group'),
+            )
+        )
+
+    @mark_safe
+    def last_messages(self, obj):
+        return '<br>'.join(
+            map(
+                lambda m: get_message_as_html(m),
+                Message.objects.filter(sender=obj.user_id).order_by('-sent_at')[:10],
+            )
         )
 
     def is_verified(self, obj):
@@ -37,16 +98,32 @@ class TelegramUserModelAdmin(PublicModelAdmin):
         return bool(obj.deleted)
 
     is_verified.boolean = True
-    is_verified.short_description = "Verificado"
-
     is_fake.boolean = True
-    is_fake.short_description = "Fake"
-
     is_deleted.boolean = True
+
+    is_verified.short_description = "Verificado"
+    is_fake.short_description = "Fake"
     is_deleted.short_description = "Excluído"
+    full_name.short_description = "Nome"
+    total_messages.short_description = "Mensagens postadas"
+    last_messages.short_description = "Últimas mensagens"
+    groups.short_description = "Grupos"
+
+
+class GroupModelAdmin(PublicModelAdmin):
+    search_fields = ['id']
+    list_display = ('id', 'total_messages', 'active')
+    fields = ['id', 'total_messages', 'active']
+
+    def total_messages(self, obj):
+        return Message.objects.filter(group=obj.id).count()
+
+    total_messages.short_description = 'Mensagens armazenadas'
 
 
 class MessageModelAdmin(PublicModelAdmin):
+    PROCESSING_MESSAGE = "Processando, volte mais tarde."
+
     search_fields = ['message']
     list_display = (
         'id',
@@ -95,15 +172,27 @@ class MessageModelAdmin(PublicModelAdmin):
 
     @mark_safe
     def photo_tag(self, obj):
-        return f"<img src=\"{obj.photo_url}\" />" if obj.photo_url else "-"
+        return (
+            (
+                f"<img src=\"{obj.photo_url}\" />"
+                if obj.photo_url
+                else self.PROCESSING_MESSAGE
+            )
+            if self.has_image(obj)
+            else "-"
+        )
 
     @mark_safe
     def audio_tag(self, obj):
         return (
-            "<audio controls preload=\"metadata\" style=\" width:300px;\"><source"
-            f" src=\"{obj.audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
-            f" acesse {obj.audio_url}.</audio>"
-            if obj.audio_url
+            (
+                "<audio controls preload=\"metadata\" style=\" width:300px;\"><source"
+                f" src=\"{obj.audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
+                f" acesse {obj.audio_url}.</audio>"
+                if obj.audio_url
+                else self.PROCESSING_MESSAGE
+            )
+            if self.has_audio(obj)
             else "-"
         )
 
@@ -141,7 +230,12 @@ class MessageModelAdmin(PublicModelAdmin):
     has_video.short_description = "video"
 
 
-public_app = PublicApp("core", models=["Message", "TelegramUser"])
+public_app = PublicApp("core", models=["Message", "TelegramUser", "Group"])
 public_admin = PublicAdminSite("dashboard", public_app)
 public_admin.register(Message, MessageModelAdmin)
-# public_admin.register(TelegramUser, TelegramUserModelAdmin)
+public_admin.register(TelegramUser, TelegramUserModelAdmin)
+public_admin.register(Group, GroupModelAdmin)
+
+public_admin.site_header = "Telegram Scrapper"
+public_admin.site_title = "Telegram Scrapper"
+public_admin.index_title = "Dados"

@@ -7,7 +7,6 @@ services:
     command: >
       bash -c "
         source .env &&
-        pip install gunicorn whitenoise &&
         pip install -r requirements.txt &&
         python manage.py collectstatic --noinput &&
         gunicorn telegram_scrapper.wsgi -b :8000
@@ -25,8 +24,6 @@ services:
       - AWS_SECRET_ACCESS_KEY
       - AWS_STORAGE_BUCKET_NAME
       - AWS_S3_REGION_NAME
-      - AWS_S3_ENDPOINT_URL
-      - AWS_S3_PUBLIC_BASE_URL
     volumes:
       - .:/telegram_scrapper
     restart: always

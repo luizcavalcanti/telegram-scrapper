@@ -1,0 +1,19 @@
+.dashpanel {
+	margin-bottom: 20px;
+	padding: 0px 0px 5px 0px;
+}
+
+.dashpanel .header {
+    margin: 0px 0px 5px 0px;
+    color: white;
+    background-color: #79aec8;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 12px;
+    padding: 8px;
+}
+
+.dashpanel .filter {
+	padding: 0 0 0 8px;
+	margin-bottom: 8px;
+}
