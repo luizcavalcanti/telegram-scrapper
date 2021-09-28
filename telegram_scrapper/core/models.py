@@ -1,3 +1,5 @@
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 
 
@@ -17,12 +19,17 @@ class Message(models.Model):
     photo = models.JSONField("imagem", default=dict)
     photo_url = models.CharField("URL da imagem", max_length=1024, null=True)
     forwarded = models.BooleanField("encaminhada", default=False)
+    search_vector = SearchVectorField(null=True)
 
     class Meta:
         verbose_name = "mensagem"
         verbose_name_plural = "mensagens"
         ordering = ["-sent_at"]
-        indexes = [models.Index(fields=["sent_at"]), models.Index(fields=["group"])]
+        indexes = [
+            models.Index(fields=["sent_at"]),
+            models.Index(fields=["group"]),
+            GinIndex(fields=['search_vector']),
+        ]
         unique_together = ["message_id", "group"]
 
 
