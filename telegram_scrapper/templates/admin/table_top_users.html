@@ -42,7 +42,6 @@ var loadTopUsersData = function() {
 				.attr('href', function(d) { return 'core/telegramuser/'+ d.sender +'/change/' })
 			.append('span')
 			.text(function(d) { 
-				console.log(d)
 				if (d.user)
 					return (d.user.first_name ? d.user.first_name+' ' : '') + 
 						(d.user.last_name ? d.user.last_name : '') + 
