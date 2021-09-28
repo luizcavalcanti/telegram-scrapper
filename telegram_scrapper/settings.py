@@ -46,8 +46,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -61,7 +61,7 @@ ROOT_URLCONF = "telegram_scrapper.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'telegram_scrapper/templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -117,6 +117,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "telegram_scrapper/templates/static")]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
@@ -126,14 +127,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Telegram Scrapper settings
-
 TELEGRAM_API_ID = config("TELEGRAM_API_ID", cast=int)
 TELEGRAM_API_HASH = config("TELEGRAM_API_HASH")
 
+# AWS S3 settings
 AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
-AWS_DEFAULT_ACL = 'public-read'
 AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME")
-AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL")
-AWS_S3_PUBLIC_BASE_URL = config("AWS_S3_PUBLIC_BASE_URL")
+AWS_S3_ENDPOINT_URL = f"https://s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+AWS_S3_PUBLIC_BASE_URL = (
+    f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+)
