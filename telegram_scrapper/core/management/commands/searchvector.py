@@ -1,13 +1,13 @@
 from django.core.management.base import BaseCommand
 from django.contrib.postgres.search import SearchVector
 
-from telegram_scrapper.models import Message
+from telegram_scrapper.core.models import Message
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        qs = Message.objects.all()
-        self.stdout.write("Creating search vector for {qs.count()} messages…")
+        qs = Message.objects.filter(search_vector=None)
+        self.stdout.write(f"Creating search vector for {qs.count()} messages…")
         self.stdout.write("This takes several minutes/hours.")
 
         search_vector = (
