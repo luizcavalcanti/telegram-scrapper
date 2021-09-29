@@ -8,7 +8,6 @@ from telethon.tl.types import (
     InputMessagesFilterChatPhotos,
     InputMessagesFilterMusic,
     InputMessagesFilterPhotos,
-    InputMessagesFilterPhotoVideo,
     InputMessagesFilterUrl,
     InputMessagesFilterVideo,
 )
@@ -70,12 +69,11 @@ class Command(BaseCommand):
     def _download_media_for_group(self, group, limit):
         image_filters = [
             InputMessagesFilterPhotos,
-            InputMessagesFilterPhotoVideo,
             InputMessagesFilterChatPhotos,
             InputMessagesFilterUrl,
         ]
 
-        video_filters = [InputMessagesFilterPhotoVideo, InputMessagesFilterVideo]
+        video_filters = [InputMessagesFilterVideo]
 
         for media_filter in image_filters:
             self._download_images_for_group(media_filter, group, limit)
