@@ -106,8 +106,10 @@ class TelegramUserModelAdmin(PublicModelAdmin):
     is_deleted.short_description = "Excluído"
     full_name.short_description = "Nome"
     total_messages.short_description = "Mensagens postadas"
-    last_messages.short_description = "Últimas mensagens"
     groups.short_description = "Grupos"
+
+    last_messages.short_description = "Últimas mensagens"
+    last_messages.allow_tags = True
 
 
 class GroupModelAdmin(PublicModelAdmin):
@@ -127,7 +129,7 @@ class MessageModelAdmin(PublicModelAdmin):
     search_fields = ['message']
     list_display = (
         'id',
-        'group',
+        'group_link',
         'sender_link',
         'message',
         'has_audio',
@@ -139,7 +141,7 @@ class MessageModelAdmin(PublicModelAdmin):
     fields = [
         'id',
         'message_id',
-        'group',
+        'group_link',
         'sender_link',
         'sent_at',
         'forwarded',
@@ -168,7 +170,13 @@ class MessageModelAdmin(PublicModelAdmin):
     def sender_link(self, obj):
         return (
             f"<a href=\"/dashboard/core/telegramuser/{obj.sender}\" >{obj.sender}</a>"
+            if obj.sender != 'channel'
+            else 'canal'
         )
+
+    @mark_safe
+    def group_link(self, obj):
+        return f"<a href=\"/dashboard/core/group/{obj.group}\" >{obj.group}</a>"
 
     @mark_safe
     def photo_tag(self, obj):
@@ -216,6 +224,9 @@ class MessageModelAdmin(PublicModelAdmin):
 
     sender_link.short_description = "Remetente"
     sender_link.allow_tags = True
+
+    group_link.short_description = "Grupo"
+    group_link.allow_tags = True
 
     has_audio.boolean = True
     has_audio.short_description = "audio"
