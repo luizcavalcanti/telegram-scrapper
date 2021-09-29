@@ -8,6 +8,8 @@ from .models import Message, TelegramUser, Group
 
 
 # TODO: refatorar
+# TODO: suportar video
+# TODO: suportar audio
 def get_message_as_html(msg):
     header = (
         f"<a href='/dashboard/core/message/{msg.id}'>&gt;&gt;</a> [{msg.group}] "
@@ -148,6 +150,7 @@ class MessageModelAdmin(PublicModelAdmin):
         'message',
         'photo_tag',
         'audio_tag',
+        'video_tag',
     ]
     ordering = ['-sent_at']
     list_filter = ['group']
@@ -204,6 +207,21 @@ class MessageModelAdmin(PublicModelAdmin):
             else "-"
         )
 
+    @mark_safe
+    def video_tag(self, obj):
+        return (
+            (
+                "<video width=\"320\" controls>"
+                f"<source src=\"{obj.video_url}\" type=\"video/mp4\">"
+                f"Navegador não suporta, acesse {obj.video_url}."
+                "</video>"
+                if obj.video_url
+                else self.PROCESSING_MESSAGE
+            )
+            if self.has_video(obj)
+            else "-"
+        )
+
     def has_audio(self, obj):
         return bool(obj.audio)
 
@@ -221,6 +239,9 @@ class MessageModelAdmin(PublicModelAdmin):
 
     audio_tag.short_description = 'Audio'
     audio_tag.allow_tags = True
+
+    video_tag.short_description = 'Video'
+    video_tag.allow_tags = True
 
     sender_link.short_description = "Remetente"
     sender_link.allow_tags = True
