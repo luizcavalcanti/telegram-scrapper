@@ -13,6 +13,7 @@ class Message(models.Model):
     sent_at = models.DateTimeField("enviado em")
     message = models.TextField("mensagem")
     video = models.JSONField("vídeo", default=dict)
+    video_url = models.CharField("URL do vídeo", max_length=1024, null=True)
     audio = models.JSONField("áudio", default=dict)
     audio_url = models.CharField("URL do áudio", max_length=1024, null=True)
     document = models.JSONField("documento", default=dict)
