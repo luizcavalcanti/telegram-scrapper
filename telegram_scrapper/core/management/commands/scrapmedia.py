@@ -123,8 +123,8 @@ class Command(BaseCommand):
         if media and self._should_download_video(local_message):
             if media.size > MAX_VIDEO_SIZE:
                 self.stdout.write(
-                    f"[{group}] Skipping media for {local_message.id}. Too large"
-                    f" ({media.size}B)"
+                    f"[{group}] Skipping video for {local_message.id}. Too large"
+                    f" ({media.size/(1024*1024):.2f} MB)"
                 )
                 return
 
@@ -149,8 +149,8 @@ class Command(BaseCommand):
             if self._should_download_audio(local_message):
                 if msg.audio.size > MAX_AUDIO_SIZE:
                     self.stdout.write(
-                        f"[{group}] Skipping media for {local_message.id}. Too large"
-                        f" ({msg.audio.size}B)"
+                        f"[{group}] Skipping audio for {local_message.id}. Too large"
+                        f" ({msg.audio.size/(1024*1024):.2f} MB)"
                     )
                     continue
 
