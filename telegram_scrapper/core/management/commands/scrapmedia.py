@@ -10,16 +10,19 @@ from telethon.tl.types import (
     InputMessagesFilterPhotos,
     InputMessagesFilterPhotoVideo,
     InputMessagesFilterUrl,
+    InputMessagesFilterVideo,
 )
 from telegram_scrapper.core.models import Message, Group
 
-MAX_MEDIA_SIZE = 250 * 1024 * 1024  # 250MB
+MAX_AUDIO_SIZE = 250 * 1024 * 1024  # 250MB
+MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50MB
 
 extension_to_mime = {
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
     '.png': 'image/png',
     '.mp3': 'audio/mpeg',
+    '.mp4': 'video/mp4',
 }
 
 
@@ -72,8 +75,13 @@ class Command(BaseCommand):
             InputMessagesFilterUrl,
         ]
 
+        video_filters = [InputMessagesFilterPhotoVideo, InputMessagesFilterVideo]
+
         for media_filter in image_filters:
             self._download_images_for_group(media_filter, group, limit)
+
+        for media_filter in video_filters:
+            self._download_videos_for_group(media_filter, group, limit)
 
         self._download_music_for_group(group, limit)
 
@@ -100,8 +108,35 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
 
-    def _should_download_image(self, message):
-        return message and not bool(message.photo_url)
+    def _download_videos_for_group(self, media_filter, group, limit):
+        video_messages = self.telegram_client.get_messages(
+            group, limit, filter=media_filter
+        )
+        for message in video_messages:
+            self._download_video(message, group)
+
+    def _download_video(self, message, group):
+        local_message = Message.objects.filter(
+            message_id=message.id, group=group
+        ).first()
+
+        media = message.video
+
+        if media and self._should_download_video(local_message):
+            if media.size > MAX_VIDEO_SIZE:
+                self.stdout.write(
+                    f"[{group}] Skipping media for {local_message.id}. Too large"
+                    f" ({media.size}B)"
+                )
+                return
+
+            try:
+                self.stdout.write(f"[{group}] Downloading media for {local_message.id}")
+                local_message.video_url = self._upload_media(media, message.file.ext)
+                local_message.save()
+                self.stdout.write(f"[{group}] Uploaded {local_message.video_url}")
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
 
     def _download_music_for_group(self, group, limit):
         audio_messages = self.telegram_client.get_messages(
@@ -114,10 +149,10 @@ class Command(BaseCommand):
             ).first()
 
             if self._should_download_audio(local_message):
-                if msg.audio.size > MAX_MEDIA_SIZE:
+                if msg.audio.size > MAX_AUDIO_SIZE:
                     self.stdout.write(
                         f"[{group}] Skipping media for {local_message.id}. Too large"
-                        f" ({msg.audio.size}b)"
+                        f" ({msg.audio.size}B)"
                     )
                     continue
 
@@ -130,6 +165,12 @@ class Command(BaseCommand):
                     self.stdout.write(f"[{group}] Uploaded {local_message.audio_url}")
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
+
+    def _should_download_image(self, message):
+        return message and not bool(message.photo_url)
+
+    def _should_download_video(self, message):
+        return message and not bool(message.video_url)
 
     def _should_download_audio(self, message):
         return message and not bool(message.audio_url)
