@@ -24,6 +24,14 @@ extension_to_mime = {
     '.mp4': 'video/mp4',
 }
 
+image_filters = [
+    InputMessagesFilterPhotos,
+    InputMessagesFilterChatPhotos,
+    InputMessagesFilterUrl,
+]
+
+video_filters = [InputMessagesFilterVideo]
+
 
 class Command(BaseCommand):
     help = "Scrap Telegram media from saved messages"
@@ -59,29 +67,31 @@ class Command(BaseCommand):
         parser.add_argument(
             "limit", type=int, help="Max number of media messages in each query"
         )
+        parser.add_argument(
+            "media_type",
+            type=str,
+            help="Media type to scrap [all, photo, video, audio]",
+        )
 
     def handle(self, *args, **options):
         limit = options["limit"]
+        media_type = options["media_type"]
+
         groups = Group.objects.filter(active=True)
         for group in groups:
-            self._download_media_for_group(group.id, limit)
+            self._download_media_for_group(group.id, limit, media_type)
 
-    def _download_media_for_group(self, group, limit):
-        image_filters = [
-            InputMessagesFilterPhotos,
-            InputMessagesFilterChatPhotos,
-            InputMessagesFilterUrl,
-        ]
+    def _download_media_for_group(self, group, limit, media_type):
+        if media_type in ['all', 'photo']:
+            for media_filter in image_filters:
+                self._download_images_for_group(media_filter, group, limit)
 
-        video_filters = [InputMessagesFilterVideo]
+        if media_type in ['all', 'video']:
+            for media_filter in video_filters:
+                self._download_videos_for_group(media_filter, group, limit)
 
-        for media_filter in image_filters:
-            self._download_images_for_group(media_filter, group, limit)
-
-        for media_filter in video_filters:
-            self._download_videos_for_group(media_filter, group, limit)
-
-        self._download_music_for_group(group, limit)
+        if media_type in ['all', 'audio']:
+            self._download_music_for_group(group, limit)
 
     def _download_images_for_group(self, media_filter, group, limit):
         image_messages = self.telegram_client.get_messages(
