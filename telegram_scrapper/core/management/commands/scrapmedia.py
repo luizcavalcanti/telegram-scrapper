@@ -184,14 +184,19 @@ class Command(BaseCommand):
 
         file_name = f"{file_hash.hexdigest()}{extension}"
         mime_type = extension_to_mime.get(extension, 'binary/octet-stream')
+        bucket_name = f"{settings.AWS_STORAGE_BUCKET_NAME}"
 
-        self.s3_client.put_object(
-            Body=file_bytes,
-            Bucket=f"{settings.AWS_STORAGE_BUCKET_NAME}",
-            Key=file_name,
-            ACL='public-read',
-            CacheControl='max-age=31556926',
-            ContentType=mime_type,
-        )
+        try:
+            # do nothing if file exists in bucket
+            self.s3_client.head_object(Bucket=bucket_name, Key=file_name)
+        except Exception as e:
+            self.s3_client.put_object(
+                Body=file_bytes,
+                Bucket=bucket_name,
+                Key=file_name,
+                ACL='public-read',
+                CacheControl='max-age=31556926',
+                ContentType=mime_type,
+            )
 
         return f"{self.s3_base_public_url}/{file_name}"
