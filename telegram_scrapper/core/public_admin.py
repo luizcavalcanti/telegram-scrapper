@@ -6,37 +6,80 @@ from public_admin.sites import PublicAdminSite, PublicApp
 
 from .models import Message, TelegramUser, Group
 
+PROCESSING_MESSAGE = "Processando, volte mais tarde."
 
-# TODO: refatorar
-# TODO: suportar video
-# TODO: suportar audio
-def get_message_as_html(msg):
-    header = (
-        f"<a href='/dashboard/core/message/{msg.id}'>&gt;&gt;</a> [{msg.group}] "
-        f" {msg.sent_at.strftime('%d/%m/%Y %H:%M:%S')}"
+
+def render_video_player(video_url):
+    return (
+        f"<video controls><source src=\"{video_url}\""
+        f" type=\"video/mp4\">Navegador não suporta, acesse {video_url}.</video><br>"
     )
+
+
+def render_audio_player(audio_url):
+    return (
+        "<audio controls preload=\"metadata\"><source"
+        f" src=\"{audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
+        f" acesse {audio_url}.</audio><br>"
+    )
+
+
+def render_image(image_url):
+    return f"<img src=\"{image_url}\" /><br>"
+
+
+def render_document():
+    return (
+        '<span style="color: red;">(documentos ainda não são suportados para'
+        ' visualização)</span>'
+    )
+
+
+def render_message(msg):
     html_output = (
-        f"<img style='max-height: 200px; margin: 3px' src='{msg.photo_url}'>"
-        if msg.photo_url
-        else ''
+        f" <strong>{msg.group}</strong> {msg.sent_at.strftime('%d/%m/%Y')}"
+        f"<a href='/dashboard/core/message/{msg.id}'> (detalhes)</a>"
     )
-    html_output += f"<audio src='{msg.audio_url}'>" if msg.audio_url else ''
-    html_output += ' ' + msg.message if msg.message else ''
+    html_output += '<div class="message">'
+
     html_output += (
-        '<span style="color: red;">(video ainda não é suportado)</span>'
+        (
+            render_video_player(msg.video_url)
+            if msg.video_url
+            else f'<span style="color: red;">{PROCESSING_MESSAGE}</span><br>'
+        )
         if msg.video
         else ''
     )
+
     html_output += (
-        '<span style="color: red;">(documento ainda não é suportado)</span>'
-        if msg.document
+        (
+            render_audio_player(msg.audio_url)
+            if msg.audio_url
+            else f'<span style="color: red;">{PROCESSING_MESSAGE}</span><br>'
+        )
+        if msg.audio
         else ''
     )
 
-    if html_output == '':
-        return f"{header} - {str(msg.video)}"
+    html_output += (
+        (
+            render_image(msg.photo_url)
+            if msg.photo_url
+            else f'<span style="color: red;">{PROCESSING_MESSAGE}</span><br>'
+        )
+        if msg.photo_url
+        else ''
+    )
 
-    return f"{header} - {html_output}"
+    html_output += msg.message if msg.message else ''
+
+    html_output += render_document() if msg.document else ''
+
+    html_output += f'<div class="date">{msg.sent_at.strftime("%H:%M")}</div>'
+
+    html_output += '</div>'
+    return html_output
 
 
 class TelegramUserModelAdmin(PublicModelAdmin):
@@ -85,7 +128,7 @@ class TelegramUserModelAdmin(PublicModelAdmin):
     def last_messages(self, obj):
         return '<br>'.join(
             map(
-                lambda m: get_message_as_html(m),
+                lambda m: render_message(m),
                 Message.objects.filter(sender=obj.user_id).order_by('-sent_at')[:10],
             )
         )
@@ -126,7 +169,6 @@ class GroupModelAdmin(PublicModelAdmin):
 
 
 class MessageModelAdmin(PublicModelAdmin):
-    PROCESSING_MESSAGE = "Processando, volte mais tarde."
 
     search_fields = ['message']
     list_display = (
@@ -184,11 +226,7 @@ class MessageModelAdmin(PublicModelAdmin):
     @mark_safe
     def photo_tag(self, obj):
         return (
-            (
-                f"<img src=\"{obj.photo_url}\" />"
-                if obj.photo_url
-                else self.PROCESSING_MESSAGE
-            )
+            (render_image(obj.photo_url) if obj.photo_url else PROCESSING_MESSAGE)
             if self.has_image(obj)
             else "-"
         )
@@ -197,11 +235,9 @@ class MessageModelAdmin(PublicModelAdmin):
     def audio_tag(self, obj):
         return (
             (
-                "<audio controls preload=\"metadata\" style=\" width:300px;\"><source"
-                f" src=\"{obj.audio_url}\" type=\"audio/mpeg\">Navegador não suporta,"
-                f" acesse {obj.audio_url}.</audio>"
+                render_audio_player(obj.audio_url)
                 if obj.audio_url
-                else self.PROCESSING_MESSAGE
+                else PROCESSING_MESSAGE
             )
             if self.has_audio(obj)
             else "-"
@@ -211,12 +247,9 @@ class MessageModelAdmin(PublicModelAdmin):
     def video_tag(self, obj):
         return (
             (
-                "<video width=\"320\" controls>"
-                f"<source src=\"{obj.video_url}\" type=\"video/mp4\">"
-                f"Navegador não suporta, acesse {obj.video_url}."
-                "</video>"
+                render_video_player(obj.video_url)
                 if obj.video_url
-                else self.PROCESSING_MESSAGE
+                else PROCESSING_MESSAGE
             )
             if self.has_video(obj)
             else "-"
