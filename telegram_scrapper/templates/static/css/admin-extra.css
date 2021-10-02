@@ -1,3 +1,11 @@
+video {
+    width: 350px;
+}
+
+audio {
+    width: 350px;
+}
+
 .dashpanel {
 	margin-bottom: 20px;
 	padding: 0px 0px 5px 0px;
@@ -16,4 +24,24 @@
 .dashpanel .filter {
 	padding: 0 0 0 8px;
 	margin-bottom: 8px;
+}
+
+.message {
+    background-color: #dbf0fd;
+    border-radius: 5px;
+    padding: 10px;
+    width: 400px;
+    font-size: 14px;
+}
+
+.message .date {
+    color: #85a9c4;
+    width: 100%;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message img {
+    max-height: 200px;
+    margin-bottom: 5px;
 }
