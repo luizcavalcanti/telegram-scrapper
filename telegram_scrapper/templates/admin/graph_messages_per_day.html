@@ -23,6 +23,7 @@ var renderData = function(data) {
 	width = container.clientWidth - margin.left - margin.right
 	height = 300 - margin.top - margin.bottom
 
+	d3.select("#total_messages").selectAll("*").remove();
 	// append the svg object to div
 	svg = d3.select("#total_messages")
 	  .append("svg")
@@ -32,7 +33,6 @@ var renderData = function(data) {
 		.attr("transform",
 			  "translate(" + margin.left + "," + margin.top + ")");
 
-	svg.selectAll("*").remove();
 	// Add X axis --> it is a date format
 	var x = d3.scaleTime()
 	  .domain(d3.extent(data, function(d) { return d3.timeParse("%Y-%m-%d")(d.date); }))
