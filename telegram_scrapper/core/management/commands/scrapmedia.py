@@ -14,7 +14,7 @@ from telethon.tl.types import (
 from telegram_scrapper.core.models import Message, Group
 
 MAX_AUDIO_SIZE = 250 * 1024 * 1024  # 250MB
-MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50MB
+MAX_VIDEO_SIZE = 100 * 1024 * 1024  # 100MB
 
 extension_to_mime = {
     '.jpg': 'image/jpeg',
