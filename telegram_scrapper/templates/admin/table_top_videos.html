@@ -1,8 +1,8 @@
 <div class="dashpanel">
-  <div class="header">Usuários que mais postam</div>
+  <div class="header">Videos mais frequentes</div>
   <div class="filter">
     Período:
-    <select id="top_users_param_days" type="select" onchange="loadTopUsersData();">
+    <select id="top_videos_param_days" type="select" onchange="loadData();">
       <option value="7">7 dias</option>
       <option value="15">15 dias</option>
       <option value="30" selected="true">30 dias</option>
@@ -13,24 +13,22 @@
       <option value="365">365 dias</option>
     </select>
   </div>
-  <div id="top_users"></div>
+  <div id="top_videos"></div>
 </div>
 <script type="text/javascript">
-  var loadTopUsersData = function() {
-      container = document.getElementById("top_users").parentNode;
-      days = document.getElementById("top_users_param_days").value;
+  var loadData = function() {
+      container = document.getElementById("top_videos").parentNode;
 
-      margin = {top: 10, right: 30, bottom: 30, left: 60},
-      height = 300 - margin.top - margin.bottom;
+      days = document.getElementById("top_videos_param_days").value;
 
-      d3.json('/api/top_users?limit=5&days='+days).then((data) => {
-          columns = ['Usuário', 'Mensagens']
+      d3.json('/api/top_videos?limit=5&days='+days).then((data) => {
+          columns = ['Posição', 'Ocorrências', 'Video']
 
-          var div = d3.select('#top_users')
+          var div = d3.select('#top_videos')
           div.selectAll("*").remove();
           var table = div.append('table')
           var thead = table.append('thead')
-          var	tbody = table.append('tbody');
+          var tbody = table.append('tbody');
 
           table.attr("style", "width: "+(container.clientWidth - 5)+"px;");
 
@@ -45,27 +43,29 @@
               .enter()
               .append('tr');
 
-          rows.append('td')
-              .append('a')
-              .attr('href', function(d) { return 'core/telegramuser/'+ d.sender +'/change/' })
-              .append('span')
-              .text(function(d) {
-                  if (d.user)
-                      return (d.user.first_name ? d.user.first_name+' ' : '') +
-                      (d.user.last_name ? d.user.last_name : '') +
-                      (d.user.username ? ' ('+d.user.username+')' : '')
-                  else
-                      return d.sender
-              })
 
+          var pos = 0
+          rows.append('td')
+              .text(function(d) {
+                  pos++;
+                  return pos;
+              });
 
           rows.append('td')
               .text(function(d) { return d.total });
+
+          rows.append('td')
+              .append('video')
+              .attr('controls', '')
+              .attr('style', 'max-width: 250px')
+              .append('source')
+              .attr('src', function(d) { return d.video_url })
+              .attr('type', 'video/mp4');
 
 
           return table;
       });
   }
 
-  loadTopUsersData();
+  loadData();
 </script>

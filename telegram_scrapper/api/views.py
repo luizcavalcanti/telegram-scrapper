@@ -45,6 +45,22 @@ def top_images(request):
     return JsonResponse(list(data), safe=False)
 
 
+def top_videos(request):
+    past_days = int(request.GET.get('days', _DEFAULT_DAYS))
+    limit = int(request.GET.get('limit', _DEFAULT_LIMIT))
+    start_date = datetime.today() - timedelta(days=past_days)
+    end_date = datetime.today()
+    data = (
+        Message.objects.filter(sent_at__range=[start_date.date(), end_date.date()])
+        .annotate(count=Count('video_url'))
+        .order_by('-count')
+        .values('video_url')
+        .annotate(**{'total': Count('video_url')})[:limit]
+    )
+
+    return JsonResponse(list(data), safe=False)
+
+
 def top_users(request):
     past_days = int(request.GET.get('days', _DEFAULT_DAYS))
     limit = int(request.GET.get('limit', _DEFAULT_LIMIT))
