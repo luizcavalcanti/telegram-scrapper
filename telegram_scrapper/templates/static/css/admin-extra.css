@@ -26,12 +26,50 @@ audio {
 	margin-bottom: 8px;
 }
 
+.reportpanel {
+    border-bottom: 1px solid #79aec8;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+.reportpanel .header {
+    /* color: #79aec8; */
+    color: #447e9b;
+    background-color: white;
+    margin: 0 0 5 0;
+    padding: 5;
+    font-weight: bold;
+}
+
+.reportpanel .header i {
+    font-size: 16px;
+    color: black;
+}
+
+.reportpanel .header:hover {
+    cursor: pointer;
+}
+
+.reportpanel .graph {
+   /* margin: 5px 0 15px 0; */
+}
+
+.collapsible {
+    visibility: visible;
+}
+
+.collapsible.collapsed {
+    visibility: collapse;
+    height: 0px;
+}
+
 .message {
     background-color: #dbf0fd;
     border-radius: 5px;
     padding: 10px;
-    width: 400px;
+    width: 300px;
     font-size: 14px;
+    border: 1px solid #Cad3da;
 }
 
 .message .date {
@@ -42,6 +80,6 @@ audio {
 }
 
 .message img {
-    max-height: 200px;
+    max-width: 250px;
     margin-bottom: 5px;
 }
