@@ -83,3 +83,7 @@ audio {
     max-width: 250px;
     margin-bottom: 5px;
 }
+
+.message video {
+    width: 300px
+}
