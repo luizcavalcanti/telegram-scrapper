@@ -40,7 +40,7 @@ class Command(BaseCommand):
     def telegram_client(self):
         if not getattr(self, "_telegram_client", None):
             self._telegram_client = TelegramClient(
-                "session_name", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
+                "media_scrapping", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
             ).start()
 
         return self._telegram_client
@@ -80,6 +80,8 @@ class Command(BaseCommand):
         groups = Group.objects.filter(active=True)
         for group in groups:
             self._download_media_for_group(group.id, limit, media_type)
+
+        self.telegram_client.disconnect()
 
     def _download_media_for_group(self, group, limit, media_type):
         if media_type in ['all', 'photo']:
