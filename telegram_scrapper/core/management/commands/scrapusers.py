@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def telegram_client(self):
         if not getattr(self, "_telegram_client", None):
             self._telegram_client = TelegramClient(
-                "session_name", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
+                "user_scrapping", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
             ).start()
 
         return self._telegram_client
@@ -27,6 +27,7 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"{total - previous_count} new users found!")
         )
         self.stdout.write(f"{total} users stored!")
+        self.telegram_client.disconnect()
 
     def _get_from_groups(self):
         groups = Group.objects.filter(active=True)

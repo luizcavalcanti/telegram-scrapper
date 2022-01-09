@@ -20,7 +20,7 @@ class Command(BaseCommand):
     def telegram_client(self):
         if not getattr(self, "_telegram_client", None):
             self._telegram_client = TelegramClient(
-                "session_name", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
+                "message_scrapping", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
             ).start()
 
         return self._telegram_client
@@ -46,6 +46,7 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"{total - previous_count} new messages saved!")
         )
         self.stdout.write(self.style.SUCCESS(f"{total} messages stored!"))
+        self.telegram_client.disconnect()
 
     def update_group_messages(self, group, query_size):
         self.stdout.write(f"Fetching {group} messages…")
@@ -74,15 +75,6 @@ class Command(BaseCommand):
                 continue
 
             setattr(obj, kind, media.to_json())
-
-        # TODO: move to a separated command
-        # with TemporaryDirectory() as tmp:
-        #     # TODO Mudar campos no modelo de JSONField para FileField e salvar
-        #     path = f"{tmp}/{media.id}"
-        #     if not glob.glob(f"{path}*"):
-        #         self.stdout.write(f"\tdownloading media {media.id}...")
-        #         self.telegram_client.download_media(message=media, file=path)
-        #     return obj
 
         obj.save()
 
