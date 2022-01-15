@@ -30,7 +30,7 @@ def message_search(request):
     results = Message.objects.filter(search_vector=search_query).order_by("-sent_at")
     occurency = _occurency_for_messages(results)
 
-    paginator = Paginator(results, 20)
+    paginator = Paginator(results, 100)
     page_obj = paginator.get_page(page_number)
 
     return render(
