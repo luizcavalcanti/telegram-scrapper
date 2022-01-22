@@ -16,6 +16,13 @@ div.page-title {
     margin: 20px 5px;
 }
 
+div.page-section {
+    font-weight: bold;
+    font-size: 16pt;
+    color: #6e7375;
+    margin: 20px 5px;
+}
+
 div.search-bar {
     margin: 10px 0px;
 }
@@ -133,4 +140,9 @@ div.report-panel {
 
 .per-page {
     font-size: 10pt;
+}
+
+.info-table label {
+    color: #447e9b;
+    font-weight: bold;
 }

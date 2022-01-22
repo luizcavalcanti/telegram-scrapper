@@ -44,11 +44,16 @@ def message_search(request):
         }
     )
 
+def users(request, user_id):
+    user = TelegramUser.objects.get(user_id=user_id)
+    last_messages =  Message.objects.filter(sender=user_id).order_by('-sent_at')[:30]
+    return render(request, 'user.html', { 'user': user, 'last_messages': last_messages })
 
 urls = (
     [
         path('', home, name='dashboard'),
-        path('message_search/', message_search, name='message_search')
+        path('message_search/', message_search, name='message_search'),
+        path('users/<int:user_id>/', users, name='users')
     ],
     '',
     '',

@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+    <link rel="stylesheet" href="https://cdn.lineicons.com/3.0/lineicons.css">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <script src="{% static 'js/functions.js' %}"></script>
+    <script src="https://d3js.org/d3.v6.js"></script>
+  </head>
+  <body>
+    <div class="title">Telegram Scrapper</div>
+    {% include "_search_bar.html" %}
+    {% block content %}{% endblock %}
+  </body>
+</html>

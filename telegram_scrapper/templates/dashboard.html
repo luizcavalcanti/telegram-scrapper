@@ -1,28 +1,22 @@
-{% load i18n static humanize %}
-<html>
-  <head>
-    {% include "_head.html" %}
-  </head>
-  <body>
-    <div class="title">Telegram Scrapper</div>
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
 
-    {% include "_search_bar.html" %}
+<div class="dash-panel">
+  <span class="data">{{ total_groups | intcomma }}</span>
+  <span class="description">Grupos monitorados</span>
+</div>
 
-    <div class="dash-panel">
-      <span class="data">{{ total_groups | intcomma }}</span>
-      <span class="description">Grupos monitorados</span>
-    </div>
+<div class="dash-panel">
+  <span class="data">{{ total_messages | intcomma }}</span>
+  <span class="description">Mensagens indexadas</span>
+</div>
 
-    <div class="dash-panel">
-      <span class="data">{{ total_messages | intcomma }}</span>
-      <span class="description">Mensagens indexadas</span>
-    </div>
+<div class="dash-panel">
+  <span class="data">{{ total_users | intcomma }}</span>
+  <span class="description">Usuários indexados</span>
+</div>
+{% include "dashboard/_graph_messages_per_day.html" %}
 
-    <div class="dash-panel">
-      <span class="data">{{ total_users | intcomma }}</span>
-      <span class="description">Usuários indexados</span>
-    </div>
+{% endblock %}
 
-    {% include "dashboard/_graph_messages_per_day.html" %}
-  </body>
-</html>
