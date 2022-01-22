@@ -26,7 +26,7 @@ def _occurency_for_messages(queryset):
 def message_search(request):
     query = request.GET.get('query')
     page_number = request.GET.get('page', 1)
-    search_query = SearchQuery(query)
+    search_query = SearchQuery(query, config="portuguese")
     results = Message.objects.filter(search_vector=search_query).order_by("-sent_at")
     occurency = _occurency_for_messages(results)
 
