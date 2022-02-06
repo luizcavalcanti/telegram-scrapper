@@ -2,6 +2,14 @@ body {
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
+video {
+    width: 350px;
+}
+
+audio {
+    width: 350px;
+}
+
 div.title {
     font-weight: bold;
     font-size: 28pt;
@@ -80,8 +88,8 @@ div.report-panel {
 }
 
 .report-panel .header {
-    margin: 0 0 5 0;
-    padding: 5;
+    margin: 0 0 5px 0;
+    padding: 5px;
     font-weight: bold;
     font-size: 12pt;
 }
@@ -95,8 +103,9 @@ div.report-panel {
 .results-table {
     border-collapse: collapse;
     margin: 25px 0;
-    font-size: 10pt;
-    min-width: 400px;
+    font-size: 11pt;
+    /* min-width: 400px; */
+    width: 100%;
 }
 
 .results-table thead tr {
@@ -105,9 +114,13 @@ div.report-panel {
     text-align: left;
 }
 
-.results-table th,
-.results-table td {
+.results-table th {
     padding: 12px 15px;
+}
+
+.results-table td {
+    padding: 5px;
+    vertical-align: top;
 }
 
 .results-table tbody tr {
@@ -122,8 +135,9 @@ div.report-panel {
     border-bottom: 2px solid #447e9b;
 }
 
-.results-table td.message {
+.results-table td .message {
     white-space: pre-wrap;
+    font-family: Helvetica;
 }
 
 .step-links {
@@ -145,4 +159,8 @@ div.report-panel {
 .info-table label {
     color: #447e9b;
     font-weight: bold;
+}
+
+.info-table td {
+    padding: 0 0 0 10px;
 }

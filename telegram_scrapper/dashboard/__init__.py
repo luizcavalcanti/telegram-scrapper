@@ -23,19 +23,24 @@ def _occurency_for_messages(queryset):
     return queryset.annotate(date=TruncDate('sent_at')).order_by('date').values('date').annotate(**{'total': Count('sent_at')})
 
 
-def message_search(request):
+def messages(request):
     query = request.GET.get('query')
     page_number = request.GET.get('page', 1)
-    search_query = SearchQuery(query, config="portuguese")
-    results = Message.objects.filter(search_vector=search_query).order_by("-sent_at")
-    occurency = _occurency_for_messages(results)
+
+    if query:
+        search_query = SearchQuery(query, config="portuguese")
+        results = Message.objects.filter(search_vector=search_query).order_by("-sent_at")
+        occurency = _occurency_for_messages(results)
+    else:
+        results = Message.objects.all().order_by("-sent_at")
+        occurency = None
 
     paginator = Paginator(results, 100)
     page_obj = paginator.get_page(page_number)
 
     return render(
         request,
-        'message_search.html',
+        'messages.html',
         {
             'query': query,
             'results': page_obj,
@@ -44,7 +49,23 @@ def message_search(request):
         }
     )
 
-def users(request, user_id):
+def users(request):
+    page_number = request.GET.get('page', 1)
+
+    results = TelegramUser.objects.all()
+    paginator = Paginator(results, 100)
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'users.html',
+        {
+            'results': page_obj,
+            'results_count': paginator.count
+        }
+    )
+
+def user(request, user_id):
     user = TelegramUser.objects.get(user_id=user_id)
     last_messages =  Message.objects.filter(sender=user_id).order_by('-sent_at')[:30]
     return render(request, 'user.html', { 'user': user, 'last_messages': last_messages })
@@ -52,8 +73,9 @@ def users(request, user_id):
 urls = (
     [
         path('', home, name='dashboard'),
-        path('message_search/', message_search, name='message_search'),
-        path('users/<int:user_id>/', users, name='users')
+        path('messages/', messages, name='messages'),
+        path('users/', users, name='users'),
+        path('users/<int:user_id>/', user, name='user')
     ],
     '',
     '',

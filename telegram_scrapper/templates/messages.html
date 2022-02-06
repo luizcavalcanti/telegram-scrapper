@@ -1,36 +1,45 @@
-
 {% extends "base.html" %}
 {% load humanize %}
 {% block content %}
 
+{% if query is not None %}
 <div class="page-title">Resultados para "{{ query }}" ({{ results_count | intcomma }} encontrados)</div>
+{% include "messages/_occurency_graph.html" %}
+{% else %}
+<div class="page-title">Mensagens ({{ results_count | intcomma }} encontrados)</div>
+{% endif %}
 
 {% if results %}
-{% include "message_search/_occurency_graph.html" %}
-{% include "message_search/_pagination.html" %}
+{% include "common/_pagination.html" %}
 
 <table class="results-table">
+  <colgroup>
+    <col>
+    <col>
+    <col>
+    <col style="width:70%">
+  </colgroup>
   <thead>
     <tr>
       <th>Data</th>
+      <th>Grupo</th>
       <th>Usuário</th>
       <th>Mensagem</th>
-      <th>Grupo</th>
     </tr>
   </thead>
   <tbody>
     {% for message in results %}
     <tr>
       <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
-      <td><a href="/users/{{ message.sender }}">{{ message.sender }}</a></td>
-      <td class="message">{{ message.message }}</td>
       <td>{{ message.group }}</td>
+      <td><a href="/users/{{ message.sender }}">{{ message.sender }}</a></td>
+      <td>{% include "messages/_message.html" with message=message %}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
-{% include "message_search/_pagination.html" %}
+{% include "common/_pagination.html" %}
 {% endif %}
 
 {% endblock %}

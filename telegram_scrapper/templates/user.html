@@ -8,10 +8,10 @@
     <td><label>ID</label></td><td>{{ user.user_id }}</td>
   </tr>
   <tr>
-    <td><label>Usuário</label></td><td>@{{ user.username }}</td>
+    <td><label>Usuário</label></td><td>{{ user.username | default_if_none:"-" }}</td>
   </tr>
   <tr>
-    <td><label>Nome</label></td><td>{{ user.first_name }} {{ user.last_name }}</td>
+    <td><label>Nome</label></td><td>{{ user.first_name | default_if_none:"" }} {{ user.last_name | default_if_none:"" }}</td>
   </tr>
   <!-- <tr> -->
   <!--   <td><label>Foto</label></td><td>TODO: {{ user.photo }}</td> -->

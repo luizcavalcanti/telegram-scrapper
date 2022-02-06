@@ -7,12 +7,12 @@
   <span class="description">Grupos monitorados</span>
 </div>
 
-<div class="dash-panel">
+<div class="dash-panel" onclick="location.href='/messages';" style="cursor: pointer;">
   <span class="data">{{ total_messages | intcomma }}</span>
   <span class="description">Mensagens indexadas</span>
 </div>
 
-<div class="dash-panel">
+<div class="dash-panel" onclick="location.href='/users';" style="cursor: pointer;">
   <span class="data">{{ total_users | intcomma }}</span>
   <span class="description">Usuários indexados</span>
 </div>

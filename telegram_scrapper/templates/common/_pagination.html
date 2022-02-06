@@ -9,8 +9,14 @@
   </span>
 
   {% if results.has_next %}
+  {% if query %}
   <a href="?query={{ query }}&page={{ results.next_page_number }}">&gt;</a>
   <a href="?query={{ query }}&page={{ results.paginator.num_pages }}">&gt;&gt;</a>
+  {% else %}
+  <a href="?page={{ results.next_page_number }}">&gt;</a>
+  <a href="?page={{ results.paginator.num_pages }}">&gt;&gt;</a>
+  {% endif %}
+
   {% endif %}
 </span>
 <span class="step-links per-page">({{ results.paginator.per_page }} registros por página)</span>
