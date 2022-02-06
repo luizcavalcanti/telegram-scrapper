@@ -2,7 +2,7 @@
 {% load humanize %}
 {% block content %}
 
-<div class="dash-panel">
+<div class="dash-panel" onclick="location.href='/groups';" style="cursor: pointer;">
   <span class="data">{{ total_groups | intcomma }}</span>
   <span class="description">Grupos monitorados</span>
 </div>

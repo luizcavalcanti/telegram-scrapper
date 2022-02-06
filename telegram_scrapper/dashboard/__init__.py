@@ -49,6 +49,22 @@ def messages(request):
         }
     )
 
+def groups(request):
+    page_number = request.GET.get('page', 1)
+
+    results = Group.objects.all()
+    paginator = Paginator(results, 100)
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'groups.html',
+        {
+            'results': page_obj,
+            'results_count': paginator.count
+        }
+    )
+
 def users(request):
     page_number = request.GET.get('page', 1)
 
@@ -74,6 +90,7 @@ urls = (
     [
         path('', home, name='dashboard'),
         path('messages/', messages, name='messages'),
+        path('groups/', groups, name='groups'),
         path('users/', users, name='users'),
         path('users/<int:user_id>/', user, name='user')
     ],
