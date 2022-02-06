@@ -1,0 +1,33 @@
+
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+
+<div class="page-title">Usuários ({{ results_count | intcomma }} encontrados)</div>
+
+{% if results %}
+{% include "common/_pagination.html" %}
+
+<table class="results-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Usuário</th>
+      <th>Nome</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in results %}
+    <tr>
+      <td><a href="/users/{{ user.user_id }}">{{ user.user_id }}</a></td>
+      <td>{{ user.username | default_if_none:"-" }}</td>
+      <td>{{ user.first_name | default_if_none:"" }} {{ user.last_name | default_if_none:"" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "common/_pagination.html" %}
+{% endif %}
+
+{% endblock %}

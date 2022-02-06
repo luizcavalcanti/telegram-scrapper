@@ -1,0 +1,61 @@
+<div class="report-panel">
+  <div class="header">
+    Ocorrências ao longo do tempo
+  </div>
+  <div id="occurency_graph"></div>
+</div>
+
+<script type="text/javascript">
+  var occurencyData = [{% for line in occurency %}{ 'date': '{{ line.date | date:'Y-m-d' }}', 'total': {{ line.total }} },{% endfor %}];
+
+  var renderData = function(data) {
+	  container = document.getElementById("occurency_graph").parentNode;
+
+	  margin = {top: 10, right: 30, bottom: 60, left: 60}
+	  width = container.clientWidth - margin.left - margin.right
+	  height = 350 - margin.top - margin.bottom
+
+	  d3.select("#occurency_graph").selectAll("*").remove();
+	  // append the svg object to div
+	  svg = d3.select("#occurency_graph")
+	      .append("svg")
+		  .attr("width", width + margin.left + margin.right)
+		  .attr("height", height + margin.top + margin.bottom)
+	      .append("g")
+		  .attr("transform",
+			    "translate(" + margin.left + "," + margin.top + ")");
+
+	  // Add X axis --> it is a date format
+	  var x = d3.scaleTime()
+	      .domain(d3.extent(data, function(d) { return d3.timeParse("%Y-%m-%d")(d.date); }))
+	      .range([ 0, width ]);
+	  svg.append("g")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d/%m/%Y")))
+	      .selectAll("text")
+		  .style("text-anchor", "end")
+		  .attr("dx", "-.8em")
+		  .attr("dy", ".15em")
+		  .attr("transform", "rotate(-35)");
+
+	  // Add Y axis
+	  var y = d3.scaleLinear()
+	      .domain([0, d3.max(data, function(d) { return +d.total; })])
+	      .range([ height, 0 ]);
+	  svg.append("g")
+	      .call(d3.axisLeft(y));
+
+	  // Add the line
+	  svg.append("path")
+		  .datum(data)
+		  .attr("fill", "none")
+		  .attr("stroke", "steelblue")
+		  .attr("stroke-width", 2)
+		  .attr("d", d3.line()
+			    .x(function(d) { return x(d3.timeParse("%Y-%m-%d")(d.date)) })
+			    .y(function(d) { return y(d.total) })
+		       );
+  };
+
+  renderData(occurencyData);
+</script>

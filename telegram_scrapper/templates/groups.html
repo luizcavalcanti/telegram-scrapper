@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+
+<div class="page-title">Grupos ({{ results_count | intcomma }} encontrados)</div>
+
+{% if results %}
+{% include "common/_pagination.html" %}
+
+<table class="results-table">
+  <thead>
+    <tr>
+      <th>ID do grupo</th>
+      <th>Usuários</th>
+      <th>Ativo</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for group in results %}
+    <tr>
+      <td><a href="/groups/{{group.id}}">{{ group.id }}</a></td>
+      <td>{{ group.users_count | intcomma }}</td>
+      <td>
+        {% if group.active %}
+        <i style="color: green" class="lni lni-checkmark"></i>
+        {% else %}
+        <i style="color: red" class="lni lni-cross-circle"></i>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "common/_pagination.html" %}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-title">Detalhes de grupo {{user.user_id}}</div>
+
+<table class="info-table">
+  <tr>
+    <td><label>ID</label></td>
+    <td>{{ group.id }}</td>
+  </tr>
+  <tr>
+    <td><label>Ativo</label></td>
+    <td>
+      {% if group.active %}
+      <i style="color: green" class="lni lni-checkmark"></i>
+      {% else %}
+      <i style="color: red" class="lni lni-cross-circle"></i>
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td><label>Mensagens</label></td>
+    <td>{{ total_messages }}</td>
+  </tr>
+</table>
+
+{% include "messages/_occurency_graph.html" with occurency=activity %}
+
+<div class="page-section">Últimas mensagens</div>
+
+<table class="results-table">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Usuário</th>
+      <th>Mensagem</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for message in last_messages %}
+    <tr>
+      <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
+      <td>{{ message.sender }}</td>
+      <td>{% include "messages/_message.html" with message=message %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

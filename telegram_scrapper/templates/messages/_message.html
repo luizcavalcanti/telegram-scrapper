@@ -1,0 +1,25 @@
+{% if message.video %}
+{% if message.video_url %}
+<video controls><source src="{{ message.video_url }}" type="video/mp4">Navegador não suporta. Acesse {{message.video_url}}</video>
+{% else %}
+<span style="color: red;">[Mídia em processamento, tente mais tarde]</span>
+{% endif%}
+{% endif%}
+
+{% if message.audio %}
+{% if message.audio_url %}
+<audio controls preload="metadata"><source src="{{ message.audio_url }}" type="audio/mpeg">Navegador não suporta. Acesse {{ message.audio_url }}.</audio>
+{% else %}
+<span style="color: red;">[Mídia em processamento, tente mais tarde]</span>
+{% endif%}
+{% endif%}
+
+{% if message.photo %}
+{% if message.photo_url %}
+<a href="{{ message.photo_url }}" target="_blank"><img src="{{ message.photo_url }}" style="max-width: 250px; margin-bottom: 5px;"/></a>
+{% else %}
+<span style="color: red;">[Mídia em processamento, tente mais tarde]</span>
+{% endif%}
+{% endif %}
+
+<div class="message">{{ message.message }}</div>

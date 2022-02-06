@@ -1,0 +1,22 @@
+<span class="step-links">
+  {% if results.has_previous %}
+  <a href="?query={{ query }}&page=1">&lt;&lt;</a>
+  <a href="?query={{ query }}&page={{ results.previous_page_number }}">&lt;</a>
+  {% endif %}
+
+  <span class="current">
+    Página {{ results.number }} de {{ results.paginator.num_pages }}
+  </span>
+
+  {% if results.has_next %}
+  {% if query %}
+  <a href="?query={{ query }}&page={{ results.next_page_number }}">&gt;</a>
+  <a href="?query={{ query }}&page={{ results.paginator.num_pages }}">&gt;&gt;</a>
+  {% else %}
+  <a href="?page={{ results.next_page_number }}">&gt;</a>
+  <a href="?page={{ results.paginator.num_pages }}">&gt;&gt;</a>
+  {% endif %}
+
+  {% endif %}
+</span>
+<span class="step-links per-page">({{ results.paginator.per_page }} registros por página)</span>
