@@ -19,7 +19,7 @@
     {% for group in results %}
     <tr>
       <td><a href="/groups/{{group.id}}">{{ group.id }}</a></td>
-      <td>{{ group.users_count | intcomma }}</td>
+      <td>{{ group.users_count | default_if_none:"-" | intcomma }}</td>
       <td>
         {% if group.active %}
         <i style="color: green" class="lni lni-checkmark"></i>
