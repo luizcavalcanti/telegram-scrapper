@@ -1,0 +1,166 @@
+body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+video {
+    width: 350px;
+}
+
+audio {
+    width: 350px;
+}
+
+div.title {
+    font-weight: bold;
+    font-size: 28pt;
+    color: #447e9b;
+    border-bottom: 5px solid #447e9b;
+}
+
+div.page-title {
+    font-weight: bold;
+    font-size: 20pt;
+    color: #6e7375;
+    margin: 20px 5px;
+}
+
+div.page-section {
+    font-weight: bold;
+    font-size: 16pt;
+    color: #6e7375;
+    margin: 20px 5px;
+}
+
+div.search-bar {
+    margin: 10px 0px;
+}
+
+div.search-bar input {
+    height: 40px;
+    font-size: 16pt;
+    width: 40%;
+    padding-left: 10px;
+}
+
+div.search-bar i {
+    font-size: 24pt;
+}
+
+div.search-bar a {
+    color: black;
+}
+
+div.dash-panel {
+    border: 1pt solid #dbd9d9;
+    background-color: #f0f0f0;
+    display: inline-block;
+    width: 240px;
+    padding: 20px 10px;
+    margin: 10px 5px;
+}
+
+div.dash-panel span.data {
+    display: block;
+    text-align: center;
+    font-size: 32pt;
+    font-weight: bolder;
+}
+
+div.dash-panel span.description {
+    display: block;
+    text-align: center;
+    font-size: 12pt;
+    margin: 0px 20px;
+}
+
+div.dash-panel span.details {
+    display: block;
+    text-align: center;
+    font-size: 10pt;
+}
+
+div.report-panel {
+    border: 1pt solid #dbd9d9;
+    margin: 10px 5px;
+    padding-bottom: 10px;
+    width: 700px;
+    height: 365px;
+}
+
+.report-panel .header {
+    margin: 0 0 5px 0;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+.report-panel .filter {
+    font-size: 10pt;
+	padding: 0 0 0 8px;
+	margin-bottom: 8px;
+}
+
+.results-table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 11pt;
+    /* min-width: 400px; */
+    width: 100%;
+}
+
+.results-table thead tr {
+    background-color: #447e9b;
+    color: #ffffff;
+    text-align: left;
+}
+
+.results-table th {
+    padding: 12px 15px;
+}
+
+.results-table td {
+    padding: 5px;
+    vertical-align: top;
+}
+
+.results-table tbody tr {
+    border-bottom: thin solid #dddddd;
+}
+
+.results-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.results-table tbody tr:last-of-type {
+    border-bottom: 2px solid #447e9b;
+}
+
+.results-table td .message {
+    white-space: pre-wrap;
+    font-family: Helvetica;
+}
+
+.step-links {
+    display: table;
+    margin: 0 auto;
+}
+
+.step-links a {
+    margin: 0px 5px;
+    color: #447e9b;
+    font-size: 16pt;
+    text-decoration: none;
+}
+
+.per-page {
+    font-size: 10pt;
+}
+
+.info-table label {
+    color: #447e9b;
+    font-weight: bold;
+}
+
+.info-table td {
+    padding: 0 0 0 10px;
+}

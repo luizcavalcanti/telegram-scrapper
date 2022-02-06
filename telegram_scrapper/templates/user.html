@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-title">Detalhes de usuário {{user.user_id}}</div>
+
+<table class="info-table">
+  <tr>
+    <td><label>ID</label></td><td>{{ user.user_id }}</td>
+  </tr>
+  <tr>
+    <td><label>Usuário</label></td><td>{{ user.username | default_if_none:"-" }}</td>
+  </tr>
+  <tr>
+    <td><label>Nome</label></td><td>{{ user.first_name | default_if_none:"" }} {{ user.last_name | default_if_none:"" }}</td>
+  </tr>
+  <tr>
+    <td><label>Grupos</label></td>
+    <td>{{ groups | join:', ' }}</td>
+  </tr>
+  <!-- <tr> -->
+  <!--   <td><label>Foto</label></td><td>TODO: {{ user.photo }}</td> -->
+  <!-- </tr> -->
+</table>
+
+<div class="page-section">Últimas mensagens</div>
+
+<table class="results-table">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Grupo</th>
+      <th>Mensagem</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for message in last_messages %}
+    <tr>
+      <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
+      <td>{{ message.group }}</td>
+      <td>{% include "messages/_message.html" with message=message %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

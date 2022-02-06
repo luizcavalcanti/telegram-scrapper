@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+
+<div class="dash-panel" onclick="location.href='/groups';" style="cursor: pointer;">
+  <span class="data">{{ total_groups | intcomma }}</span>
+  <span class="description">Grupos monitorados</span>
+</div>
+
+<div class="dash-panel" onclick="location.href='/messages';" style="cursor: pointer;">
+  <span class="data">{{ total_messages | intcomma }}</span>
+  <span class="description">Mensagens indexadas</span>
+</div>
+
+<div class="dash-panel" onclick="location.href='/users';" style="cursor: pointer;">
+  <span class="data">{{ total_users | intcomma }}</span>
+  <span class="description">Usuários indexados</span>
+</div>
+{% include "dashboard/_graph_messages_per_day.html" %}
+
+<p>TODO:</p>
+<ul>
+  <li>Mensagens por grupo na listagem (talvez precise da FK implementada)</li>
+  <li>Usuários que mais postam</li>
+  <li>Videos mais frequentes</li>
+  <li>Imagens mais frequentes</li>
+  <li>Cache de relatórios (ou relatórios pré-processados)</li>
+</ul>
+
+{% endblock %}
+

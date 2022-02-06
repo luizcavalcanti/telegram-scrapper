@@ -3,11 +3,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from telegram_scrapper import api
+from telegram_scrapper import api, dashboard
 from telegram_scrapper.core.public_admin import public_admin
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", api.urls),
+    path("", dashboard.urls),
     path("dashboard/", public_admin.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
