@@ -49,6 +49,7 @@ def messages(request):
         }
     )
 
+
 def groups(request):
     page_number = request.GET.get('page', 1)
 
@@ -64,6 +65,7 @@ def groups(request):
             'results_count': paginator.count
         }
     )
+
 
 def group(request, group_id):
     group = Group.objects.get(id=group_id)
@@ -83,6 +85,7 @@ def group(request, group_id):
         }
     )
 
+
 def users(request):
     page_number = request.GET.get('page', 1)
 
@@ -99,6 +102,7 @@ def users(request):
         }
     )
 
+
 def user(request, user_id):
     user = TelegramUser.objects.get(user_id=user_id)
     last_messages =  Message.objects.filter(sender=user_id).order_by('-sent_at')[:30]
@@ -108,6 +112,7 @@ def user(request, user_id):
     ))
 
     return render(request, 'user.html', { 'user': user, 'last_messages': last_messages, 'groups': groups })
+
 
 urls = (
     [

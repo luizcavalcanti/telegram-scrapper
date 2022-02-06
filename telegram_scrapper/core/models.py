@@ -53,6 +53,7 @@ class TelegramUser(models.Model):
 
 class Group(models.Model):
     id = models.CharField("grupo", max_length=255, primary_key=True)
+    users_count = models.IntegerField("usuários", null=True)
     active = models.BooleanField("ativo", default=True)
 
     class Meta:
