@@ -65,6 +65,24 @@ def groups(request):
         }
     )
 
+def group(request, group_id):
+    group = Group.objects.get(id=group_id)
+    queryset = Message.objects.filter(group=group_id).order_by('-sent_at')
+    last_messages = queryset[:30]
+    total_messages = queryset.count()
+    activity = _occurency_for_messages(queryset)
+
+    return render(
+        request,
+        'group.html',
+        {
+            'group': group,
+            'total_messages': total_messages,
+            'last_messages': last_messages,
+            'activity': activity
+        }
+    )
+
 def users(request):
     page_number = request.GET.get('page', 1)
 
@@ -84,13 +102,19 @@ def users(request):
 def user(request, user_id):
     user = TelegramUser.objects.get(user_id=user_id)
     last_messages =  Message.objects.filter(sender=user_id).order_by('-sent_at')[:30]
-    return render(request, 'user.html', { 'user': user, 'last_messages': last_messages })
+    groups = list(map(
+        lambda m: m['group'],
+        Message.objects.filter(sender=user_id).values('group').distinct('group').order_by('group')
+    ))
+
+    return render(request, 'user.html', { 'user': user, 'last_messages': last_messages, 'groups': groups })
 
 urls = (
     [
         path('', home, name='dashboard'),
         path('messages/', messages, name='messages'),
         path('groups/', groups, name='groups'),
+        path('groups/<str:group_id>', group, name='group'),
         path('users/', users, name='users'),
         path('users/<int:user_id>/', user, name='user')
     ],

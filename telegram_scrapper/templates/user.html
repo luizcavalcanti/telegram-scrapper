@@ -13,6 +13,10 @@
   <tr>
     <td><label>Nome</label></td><td>{{ user.first_name | default_if_none:"" }} {{ user.last_name | default_if_none:"" }}</td>
   </tr>
+  <tr>
+    <td><label>Grupos</label></td>
+    <td>{{ groups | join:', ' }}</td>
+  </tr>
   <!-- <tr> -->
   <!--   <td><label>Foto</label></td><td>TODO: {{ user.photo }}</td> -->
   <!-- </tr> -->
@@ -33,7 +37,7 @@
     <tr>
       <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
       <td>{{ message.group }}</td>
-      <td class="message">{{ message.message }}</td>
+      <td>{% include "messages/_message.html" with message=message %}</td>
     </tr>
     {% endfor %}
   </tbody>
