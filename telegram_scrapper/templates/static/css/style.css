@@ -1,3 +1,9 @@
+:root {
+    --primary-color:#447e9b;
+    --secondary-color:#6e7375;
+    --smooth-highligh-color:#336d8a;
+}
+
 body {
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
@@ -10,29 +16,39 @@ audio {
     width: 350px;
 }
 
+a:link, a:visited, a:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:active {
+    color: var(--smooth-highlight-color);
+    text-decoration: underline;
+}
+
 div.title {
     font-weight: bold;
     font-size: 28pt;
-    color: #447e9b;
-    border-bottom: 5px solid #447e9b;
+    color: var(--primary-color);
+    border-bottom: 5px solid var(--primary-color);
 }
 
 div.title > a {
     text-decoration: none;
-    color: #447e9b;
+    color: var(--primary-color);
 }
 
 div.page-title {
     font-weight: bold;
     font-size: 20pt;
-    color: #6e7375;
+    color: var(--secondary-color);
     margin: 20px 5px;
 }
 
 div.page-section {
     font-weight: bold;
     font-size: 16pt;
-    color: #6e7375;
+    color: var(--secondary-color);
     margin: 20px 5px;
 }
 
@@ -113,12 +129,11 @@ div.report-panel {
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 11pt;
-    /* min-width: 400px; */
     width: 100%;
 }
 
 .results-table thead tr {
-    background-color: #447e9b;
+    background-color: var(--primary-color);
     color: #ffffff;
     text-align: left;
 }
@@ -141,7 +156,7 @@ div.report-panel {
 }
 
 .results-table tbody tr:last-of-type {
-    border-bottom: 2px solid #447e9b;
+    border-bottom: 2px solid var(--primary-color);
 }
 
 .results-table td .message {
@@ -156,7 +171,7 @@ div.report-panel {
 
 .step-links a {
     margin: 0px 5px;
-    color: #447e9b;
+    color: var(--primary-color);
     font-size: 16pt;
     text-decoration: none;
 }
@@ -166,10 +181,11 @@ div.report-panel {
 }
 
 .info-table label {
-    color: #447e9b;
+    color: var(--primary-color);
     font-weight: bold;
 }
 
 .info-table td {
     padding: 0 0 0 10px;
+    vertical-align: top;
 }

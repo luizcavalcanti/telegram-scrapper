@@ -15,7 +15,11 @@
   </tr>
   <tr>
     <td><label>Grupos</label></td>
-    <td>{{ groups | join:', ' }}</td>
+    <td>
+      {% for group in groups %}
+      <a href="/groups/{{ group }}">{{ group }}</a><br>
+      {% endfor %}
+    </td>
   </tr>
   <!-- <tr> -->
   <!--   <td><label>Foto</label></td><td>TODO: {{ user.photo }}</td> -->
@@ -36,7 +40,7 @@
     {% for message in last_messages %}
     <tr>
       <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
-      <td>{{ message.group }}</td>
+      <td><a href="/groups/{{message.group}}">{{ message.group }}</a></td>
       <td>{% include "messages/_message.html" with message=message %}</td>
     </tr>
     {% endfor %}

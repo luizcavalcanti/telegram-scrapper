@@ -31,7 +31,7 @@
     {% for message in results %}
     <tr>
       <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
-      <td>{{ message.group }}</td>
+      <td><a href="/groups/{{ message.group }}">{{ message.group }}</a></td>
       <td><a href="/users/{{ message.sender }}">{{ message.sender }}</a></td>
       <td>{% include "messages/_message.html" with message=message %}</td>
     </tr>
