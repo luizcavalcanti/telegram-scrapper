@@ -29,6 +29,7 @@ class Message(models.Model):
         indexes = [
             models.Index(fields=["sent_at"]),
             models.Index(fields=["group"]),
+            models.Index(fields=["sender"]),
             GinIndex(fields=['search_vector']),
         ]
         unique_together = ["message_id", "group"]
