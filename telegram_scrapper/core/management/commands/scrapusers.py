@@ -42,6 +42,8 @@ class Command(BaseCommand):
                 [self._save_user(p) for p in participants]
             except ChatAdminRequiredError as e:
                 self.stdout.write("Cannot check user list, skipping.")
+            except TypeError as e:
+                self.stdout.write(f"Type error, probably a Telethon bug. Try to update the library => {e}.")
 
     def _save_user(self, user):
         obj = TelegramUser(
