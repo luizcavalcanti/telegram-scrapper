@@ -17,6 +17,11 @@ div.title {
     border-bottom: 5px solid #447e9b;
 }
 
+div.title > a {
+    text-decoration: none;
+    color: #447e9b;
+}
+
 div.page-title {
     font-weight: bold;
     font-size: 20pt;
