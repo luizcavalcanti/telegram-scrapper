@@ -15,7 +15,7 @@ def home(request):
         'total_messages': Message.objects.count(),
         'total_groups': Group.objects.count(),
         'total_users': TelegramUser.objects.count()
-    }    
+    }
     return render(request, 'dashboard.html', context_data)
 
 
