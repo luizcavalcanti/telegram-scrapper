@@ -47,8 +47,8 @@ class TelegramUser(models.Model):
     verified = models.BooleanField("Verificado", default=False)
 
     class Meta:
-        verbose_name = "Usuário"
-        verbose_name_plural = "Usuários"
+        verbose_name = "usuário"
+        verbose_name_plural = "usuários"
         indexes = [models.Index(fields=["user_id"]), models.Index(fields=["username"])]
 
 
@@ -61,3 +61,12 @@ class Group(models.Model):
         verbose_name = "grupo"
         verbose_name_plural = "grupos"
         ordering = ["id"]
+
+class Report(models.Model):
+    id = models.CharField("ID do relatório", max_length=255, primary_key=True),
+    data = models.JSONField("Dados do relatório", default=dict),
+    updated_at = models.DateTimeField("Data de geração")
+
+    class Meta:
+        verbose_name = "relatório"
+        verbose_name_plural = "relatórios"
