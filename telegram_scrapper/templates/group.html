@@ -40,7 +40,7 @@
     {% for message in last_messages %}
     <tr>
       <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
-      <td>{{ message.sender }}</td>
+      <td><a href="/users/{{ message.sender }}">{{ message.sender }}</a></td>
       <td>{% include "messages/_message.html" with message=message %}</td>
     </tr>
     {% endfor %}
