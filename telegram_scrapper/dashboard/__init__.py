@@ -88,8 +88,7 @@ def group(request, group_id):
 
 def users(request):
     page_number = request.GET.get('page', 1)
-
-    results = TelegramUser.objects.all()
+    results = TelegramUser.objects.order_by('user_id')
     paginator = Paginator(results, 100)
     page_obj = paginator.get_page(page_number)
 

@@ -62,6 +62,7 @@ class Group(models.Model):
         verbose_name_plural = "grupos"
         ordering = ["id"]
 
+
 class Report(models.Model):
     id = models.CharField("ID do relatório", max_length=255, primary_key=True),
     data = models.JSONField("Dados do relatório", default=dict),
