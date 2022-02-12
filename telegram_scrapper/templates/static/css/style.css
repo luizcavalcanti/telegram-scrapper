@@ -100,6 +100,10 @@ div.report-panel {
 	margin-bottom: 8px;
 }
 
+.report-panel > .graph > div > table {
+    margin: 0px;
+}
+
 .results-table {
     border-collapse: collapse;
     margin: 25px 0;
