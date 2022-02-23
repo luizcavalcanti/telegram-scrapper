@@ -6,8 +6,9 @@ from django.db.models import Count, F
 from django.db.models.functions import TruncDate
 from django.shortcuts import render
 from django.urls import path
+from types import SimpleNamespace
 
-from telegram_scrapper.core.models import Group, Message, TelegramUser
+from telegram_scrapper.core.models import Group, Message, TelegramUser, Report
 
 
 def home(request):
@@ -69,17 +70,16 @@ def groups(request):
 
 def group(request, group_id):
     group = Group.objects.get(id=group_id)
-    queryset = Message.objects.filter(group=group_id).order_by('-sent_at')
-    last_messages = queryset[:30]
-    total_messages = queryset.count()
+    last_messages = Message.objects.filter(group=group_id).order_by('-sent_at')[:30]
     activity = _occurency_for_messages(queryset)
+    # activity = Report.objects.get(id=f'group_activity_{group_id}').report_data
+    # 'activity': json.loads(activity, object_hook=(lambda d: SimpleNamespace(**d)))
 
     return render(
         request,
         'group.html',
         {
             'group': group,
-            'total_messages': total_messages,
             'last_messages': last_messages,
             'activity': activity
         }

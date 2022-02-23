@@ -55,6 +55,7 @@ class TelegramUser(models.Model):
 class Group(models.Model):
     id = models.CharField("grupo", max_length=255, primary_key=True)
     users_count = models.IntegerField("usuários", null=True)
+    messages_count = models.IntegerField("mensagens", null=True)
     active = models.BooleanField("ativo", default=True)
 
     class Meta:
@@ -64,8 +65,8 @@ class Group(models.Model):
 
 
 class Report(models.Model):
-    id = models.CharField("ID do relatório", max_length=255, primary_key=True),
-    data = models.JSONField("Dados do relatório", default=dict),
+    id = models.CharField("grupo", max_length=255, primary_key=True)
+    report_data = models.JSONField("Dados", default=dict, null=True)
     updated_at = models.DateTimeField("Data de geração")
 
     class Meta:

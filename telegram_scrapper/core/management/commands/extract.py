@@ -1,13 +1,18 @@
 from tempfile import TemporaryDirectory
 
+from datetime import datetime, date
+from django.utils import timezone
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.db.utils import IntegrityError
 from telethon import TelegramClient, sync
 from telethon.tl.types import PeerUser
-from telegram_scrapper.core.models import MEDIAS, Message, Group
+from telegram_scrapper.core.models import MEDIAS, Message, Group, Report
 
 import glob
+import json
 
 
 MESSAGES_PER_QUERY = 1000
@@ -39,7 +44,8 @@ class Command(BaseCommand):
 
         groups = Group.objects.filter(active=True)
         for group in groups:
-            self.update_group_messages(group.id, query_size)
+            self._update_group_messages(group.id, query_size)
+            self._update_group_reports(group.id)
 
         total = Message.objects.count()
         self.stdout.write(
@@ -48,23 +54,23 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"{total} messages stored!"))
         self.telegram_client.disconnect()
 
-    def update_group_messages(self, group, query_size):
+    def _update_group_messages(self, group, query_size):
         self.stdout.write(f"Fetching {group} messages…")
         messages = self.telegram_client.get_messages(group, query_size)
         for message in messages:
             try:
-                self.save_message(message, group)
+                self._save_message(message, group)
             except IntegrityError as e:
                 pass
             except Exception as e:  # TODO que erros esperamos aqui?
                 raise CommandError(f"Erro baixando mensagens de {group}: {e}")
 
-    def save_message(self, message, group):
+    def _save_message(self, message, group):
         obj = Message(
             message_id=message.id,
             message=message.message if message.message else '',
             group=group,
-            sender=self.get_sender(message),
+            sender=self._get_sender(message),
             sent_at=message.date,
             forwarded=bool(message.forward),
         )
@@ -78,7 +84,34 @@ class Command(BaseCommand):
 
         obj.save()
 
-    def get_sender(self, message):
+    def _get_sender(self, message):
         return (
             message.from_id.user_id if type(message.from_id) is PeerUser else "channel"
         )
+
+    def _update_group_reports(self, group_id):
+        self.stdout.write("Updating reports...")
+
+        self._update_messages_count(group_id)
+        self._update_group_activity(group_id)
+
+        self.stdout.write("done.")
+
+    def _update_messages_count(self, group_id):
+        group = Group.objects.get(id=group_id)
+        group.messages_count = Message.objects.filter(group=group_id).count()
+        group.save()
+
+    def _update_group_activity(self, group_id):
+        activity = list(Message.objects.filter(group=group_id).order_by('-sent_at').annotate(date=TruncDate('sent_at')).order_by('date').values('date').annotate(**{'total': Count('sent_at')}))
+        Report.objects.update_or_create(
+            id=f"group_activity_{group_id}",
+            defaults={'report_data': json.dumps(activity, default=_parse_date_to_json), 'updated_at': timezone.now()}
+        )
+
+
+def _parse_date_to_json(obj):
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+
+    return str(obj)
