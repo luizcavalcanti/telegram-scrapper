@@ -70,7 +70,8 @@ def groups(request):
 
 def group(request, group_id):
     group = Group.objects.get(id=group_id)
-    last_messages = Message.objects.filter(group=group_id).order_by('-sent_at')[:30]
+    queryset = Message.objects.filter(group=group_id).order_by('-sent_at')
+    last_messages = queryset[:30]
     activity = _occurency_for_messages(queryset)
     # activity = Report.objects.get(id=f'group_activity_{group_id}').report_data
     # 'activity': json.loads(activity, object_hook=(lambda d: SimpleNamespace(**d)))
