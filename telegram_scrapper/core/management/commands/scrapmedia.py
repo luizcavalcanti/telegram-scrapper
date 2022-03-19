@@ -159,6 +159,9 @@ class Command(BaseCommand):
             ).first()
 
             if self._should_download_audio(local_message):
+                if not msg.audio:
+                    self.stdout.write(f"[{group}] Message {local_message.id} has no audio content")
+                    continue
                 if msg.audio.size > MAX_AUDIO_SIZE:
                     self.stdout.write(
                         f"[{group}] Skipping audio for {local_message.id}. Too large"
