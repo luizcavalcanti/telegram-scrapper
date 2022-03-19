@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 from datetime import datetime, date
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.postgres.search import SearchVector
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from django.db.models.functions import TruncDate
@@ -42,17 +43,34 @@ class Command(BaseCommand):
         query_size = options["limit"]
         previous_count = Message.objects.count()
 
-        groups = Group.objects.filter(active=True)
-        for group in groups:
-            self._update_group_messages(group.id, query_size)
-            self._update_group_reports(group.id)
+        self._fetch_new_messages(query_size)
+        self._update_search_vector()
+        self.telegram_client.disconnect()
 
         total = Message.objects.count()
         self.stdout.write(
             self.style.SUCCESS(f"{total - previous_count} new messages saved!")
         )
         self.stdout.write(self.style.SUCCESS(f"{total} messages stored!"))
-        self.telegram_client.disconnect()
+
+    def _fetch_new_messages(self, query_size):
+        groups = Group.objects.filter(active=True)
+        for group in groups:
+            self._update_group_messages(group.id, query_size)
+            self._update_group_reports(group.id)
+
+    def _update_search_vector(self):
+        messages = Message.objects.filter(search_vector=None)
+        self.stdout.write(f"Creating search vector for {messages.count()} messages…")
+
+        search_vector = (
+            SearchVector("message", config="portuguese", weight="A")
+            + SearchVector("group", config="portuguese", weight="B")
+            + SearchVector("sender", config="portuguese", weight="C")
+        )
+
+        messages.update(search_vector=search_vector)
+        self.stdout.write(self.style.SUCCESS("Done!"))
 
     def _update_group_messages(self, group, query_size):
         self.stdout.write(f"Fetching {group} messages…")
@@ -62,7 +80,7 @@ class Command(BaseCommand):
                 self._save_message(message, group)
             except IntegrityError as e:
                 pass
-            except Exception as e:  # TODO que erros esperamos aqui?
+            except Exception as e:  # Unpredicted errors trap :/
                 raise CommandError(f"Erro baixando mensagens de {group}: {e}")
 
     def _save_message(self, message, group):
