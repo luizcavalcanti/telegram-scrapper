@@ -41,17 +41,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         query_size = options["limit"]
-        previous_count = Message.objects.count()
 
         self._fetch_new_messages(query_size)
         self._update_search_vector()
+        self._update_general_reports()
         self.telegram_client.disconnect()
 
-        total = Message.objects.count()
-        self.stdout.write(
-            self.style.SUCCESS(f"{total - previous_count} new messages saved!")
-        )
-        self.stdout.write(self.style.SUCCESS(f"{total} messages stored!"))
+        self.stdout.write(self.style.SUCCESS(f"OK"))
 
     def _fetch_new_messages(self, query_size):
         groups = Group.objects.filter(active=True)
@@ -61,7 +57,7 @@ class Command(BaseCommand):
 
     def _update_search_vector(self):
         messages = Message.objects.filter(search_vector=None)
-        self.stdout.write(f"Creating search vector for {messages.count()} messages…")
+        self.stdout.write(f"Creating search vector for {messages.count()} messages… ", ending='')
 
         search_vector = (
             SearchVector("message", config="portuguese", weight="A")
@@ -70,7 +66,19 @@ class Command(BaseCommand):
         )
 
         messages.update(search_vector=search_vector)
-        self.stdout.write(self.style.SUCCESS("Done!"))
+        self.stdout.write("done")
+
+    def _update_general_reports(self):
+        self.stdout.write(f"Creating general reports… ", ending='')
+        self.stdout.flush()
+        Report.objects.update_or_create(
+            id=f"general_messages",
+            defaults={
+                'report_data': json.dumps({'count': Message.objects.count()}),
+                'updated_at': timezone.now()
+            }
+        )
+        self.stdout.write("done")
 
     def _update_group_messages(self, group, query_size):
         self.stdout.write(f"Fetching {group} messages…")
@@ -108,12 +116,12 @@ class Command(BaseCommand):
         )
 
     def _update_group_reports(self, group_id):
-        self.stdout.write("Updating reports...")
+        self.stdout.write("Updating reports… ", ending='')
 
         self._update_messages_count(group_id)
         self._update_group_activity(group_id)
 
-        self.stdout.write("done.")
+        self.stdout.write("done")
 
     def _update_messages_count(self, group_id):
         group = Group.objects.get(id=group_id)
