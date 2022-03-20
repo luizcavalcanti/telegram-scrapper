@@ -12,10 +12,15 @@ from telegram_scrapper.core.models import Group, Message, TelegramUser, Report
 
 
 def home(request):
+    messages_data = Report.objects.get(id='general_messages').report_data
+    total_messages = json.loads(messages_data)['count']
+    total_groups = Group.objects.count()
+    total_users = TelegramUser.objects.count()
+
     context_data = {
-        'total_messages': Message.objects.count(),
-        'total_groups': Group.objects.count(),
-        'total_users': TelegramUser.objects.count()
+        'total_messages': total_messages,
+        'total_groups': total_groups,
+        'total_users': total_users
     }
     return render(request, 'dashboard.html', context_data)
 
