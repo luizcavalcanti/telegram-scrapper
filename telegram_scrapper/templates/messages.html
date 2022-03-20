@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load humanize %}
+{% load custom_tags %}
 {% block content %}
 
 {% if query is not None %}
@@ -32,7 +33,7 @@
     <tr>
       <td>{{ message.sent_at | date:'SHORT_DATETIME_FORMAT' }}</td>
       <td><a href="/groups/{{ message.group }}">{{ message.group }}</a></td>
-      <td><a href="/users/{{ message.sender }}">{{ message.sender }}</a></td>
+      <td><a href="/users/{{ message.sender }}">{{ message.sender | pretty_user }}</a></td>
       <td>{% include "messages/_message.html" with message=message %}</td>
     </tr>
     {% endfor %}
