@@ -65,7 +65,7 @@ class Group(models.Model):
 
 
 class Report(models.Model):
-    id = models.CharField("grupo", max_length=255, primary_key=True)
+    id = models.CharField("ID", max_length=255, primary_key=True)
     report_data = models.JSONField("Dados", default=dict, null=True)
     updated_at = models.DateTimeField("Data de geração")
 
