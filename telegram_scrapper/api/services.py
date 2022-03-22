@@ -4,12 +4,15 @@ from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count
 from django.db.models.functions import TruncDate
+from django.forms.models import model_to_dict
 from django.utils import timezone
 
-from telegram_scrapper.core.models import Message, Report
+
+from telegram_scrapper.core.models import Message, Report, TelegramUser
 
 class ReportsService:
     MESSAGES_PER_DAY_CACHE_IN_HOURS = 6
+    TOP_USERS_CACHE_IN_HOURS = 6
 
     def __init__(self):
         pass
@@ -24,7 +27,20 @@ class ReportsService:
                 data = json.loads(report.report_data)
         except Report.DoesNotExist:
             data = self._generate_messages_per_day_report(report_id, past_days)
-            
+
+        return data
+
+    def top_users(self, past_days, limit):
+        report_id = f"general_top_users_{past_days}_{limit}"
+        try:
+            report = Report.objects.get(id=report_id)
+            if datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.TOP_USERS_CACHE_IN_HOURS):
+                data = self._generate_top_users_report(report_id, past_days, limit)
+            else:
+                data = json.loads(report.report_data)
+        except Report.DoesNotExist:
+            data = self._generate_top_users_report(report_id, past_days, limit)
+
         return data
 
     def _generate_messages_per_day_report(self, report_id, past_days):
@@ -43,3 +59,34 @@ class ReportsService:
                       'updated_at': timezone.now()}
         )
         return data
+
+    def _generate_top_users_report(self, report_id, past_days, limit):
+        start_date = datetime.today() - timedelta(days=past_days)
+        end_date = datetime.today() + timedelta(days=1)
+        data = (
+            Message.objects.filter(sent_at__range=[start_date.date(), end_date.date()])
+            .exclude(sender='channel')
+            .annotate(count=Count('sender'))
+            .order_by('-count')
+            .values('sender')
+            .annotate(**{'total': Count('sender')})[:limit]
+        )
+
+        # Que presepada, preciso botar uma FK nesse negócio logo
+        result_data = list(data)
+        for entry in result_data:
+            try:
+                entry['user'] = model_to_dict(
+                    TelegramUser.objects.get(user_id=entry['sender'])
+                )
+            except Exception as e:
+                print(e)
+                pass
+
+        Report.objects.update_or_create(
+            id=report_id,
+            defaults={'report_data': json.dumps(result_data, cls=DjangoJSONEncoder),
+                      'updated_at': timezone.now()}
+        )
+
+        return result_data
