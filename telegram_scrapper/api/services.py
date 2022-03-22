@@ -15,7 +15,7 @@ class ReportsService:
         pass
 
     def messages_per_day(self, past_days):
-        report_id = f"general_messages_per_dat_{past_days}"
+        report_id = f"general_messages_per_day_{past_days}"
         try:
             report = Report.objects.get(id=report_id)
             if datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.MESSAGES_PER_DAY_CACHE_IN_HOURS):
