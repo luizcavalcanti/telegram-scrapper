@@ -6,7 +6,7 @@
 </div>
 
 <script type="text/javascript">
-  var occurencyData = [{% for line in occurency %}{ 'date': '{{ line.date | date:'Y-m-d' }}', 'total': {{ line.total }} },{% endfor %}];
+  var occurencyData = [{% for line in occurency %}{ 'date': '{{ line.date }}', 'total': {{ line.total }} },{% endfor %}];
 
   var renderData = function(data) {
 	  container = document.getElementById("occurency_graph").parentNode;

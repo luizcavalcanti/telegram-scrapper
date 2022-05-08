@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.postgres.search import SearchVector
 from django.core.management.base import BaseCommand, CommandError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count
 from django.db.models.functions import TruncDate
 from django.db.utils import IntegrityError
@@ -129,15 +130,17 @@ class Command(BaseCommand):
         group.save()
 
     def _update_group_activity(self, group_id):
-        activity = list(Message.objects.filter(group=group_id).order_by('-sent_at').annotate(date=TruncDate('sent_at')).order_by('date').values('date').annotate(**{'total': Count('sent_at')}))
+        activity = list(Message.objects.filter(group=group_id)
+                        .order_by('-sent_at')
+                        .annotate(date=TruncDate('sent_at'))
+                        .order_by('date')
+                        .values('date')
+                        .annotate(**{'total': Count('sent_at')}))
+
         Report.objects.update_or_create(
             id=f"group_activity_{group_id}",
-            defaults={'report_data': json.dumps(activity, default=_parse_date_to_json), 'updated_at': timezone.now()}
+            defaults={
+                'report_data': json.dumps(activity, cls=DjangoJSONEncoder),
+                'updated_at': timezone.now()
+            }
         )
-
-
-def _parse_date_to_json(obj):
-    if isinstance(obj, (datetime, date)):
-        return obj.isoformat()
-
-    return str(obj)

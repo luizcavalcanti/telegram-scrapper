@@ -1,5 +1,6 @@
 import json
 
+from datetime import datetime
 from django.contrib.postgres.search import SearchQuery
 from django.core.paginator import Paginator
 from django.db.models import Count, F
@@ -37,6 +38,9 @@ def messages(request):
         search_query = SearchQuery(query, config="portuguese")
         results = Message.objects.filter(search_vector=search_query).order_by("-sent_at")
         occurency = _occurency_for_messages(results)
+        for entry in occurency:
+            entry['date'] = datetime.strftime(entry['date'], "%Y-%m-%d")
+
     else:
         results = Message.objects.all().order_by("-sent_at")
         occurency = None
@@ -77,9 +81,12 @@ def group(request, group_id):
     group = Group.objects.get(id=group_id)
     queryset = Message.objects.filter(group=group_id).order_by('-sent_at')
     last_messages = queryset[:30]
-    activity = _occurency_for_messages(queryset)
-    # activity = Report.objects.get(id=f'group_activity_{group_id}').report_data
-    # 'activity': json.loads(activity, object_hook=(lambda d: SimpleNamespace(**d)))
+
+    try:
+        report = Report.objects.get(id=f'group_activity_{group_id}')
+        activity = json.loads(report.report_data)
+    except:
+        activity = None
 
     return render(
         request,
