@@ -51,10 +51,14 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"OK"))
 
     def _fetch_new_messages(self, query_size):
-        groups = Group.objects.filter(active=True)
+        groups = Group.objects.all()
         for group in groups:
-            self._update_group_messages(group.id, query_size)
-            self._update_group_reports(group.id)
+            try:
+                if group.active:
+                    self._update_group_messages(group.id, query_size)
+                self._update_group_reports(group.id)
+            except Exception as e:  # Unpredicted errors trap :/
+                self.stderr.write(f"Error fetching messages from {group.id}: {e}")
 
     def _update_search_vector(self):
         messages = Message.objects.filter(search_vector=None)
@@ -89,8 +93,6 @@ class Command(BaseCommand):
                 self._save_message(message, group)
             except IntegrityError as e:
                 pass
-            except Exception as e:  # Unpredicted errors trap :/
-                raise CommandError(f"Erro baixando mensagens de {group}: {e}")
 
     def _save_message(self, message, group):
         obj = Message(

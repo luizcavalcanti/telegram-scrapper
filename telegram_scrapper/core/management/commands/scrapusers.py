@@ -44,6 +44,8 @@ class Command(BaseCommand):
                 self.stdout.write("Cannot check user list, skipping.")
             except TypeError as e:
                 self.stdout.write(f"Type error, probably a Telethon bug. Try to update the library => {e}.")
+            except Exception as e:  # Unpredicted errors trap :/
+                self.stderr.write(f"Error fetching users from {group.id}: {e}")
 
     def _save_user(self, user):
         obj = TelegramUser(

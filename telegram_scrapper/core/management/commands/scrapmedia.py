@@ -79,7 +79,10 @@ class Command(BaseCommand):
 
         groups = Group.objects.filter(active=True)
         for group in groups:
-            self._download_media_for_group(group.id, limit, media_type)
+            try:
+                self._download_media_for_group(group.id, limit, media_type)
+            except Exception as e:  # Unpredicted errors trap :/
+                self.stderr.write(f"Error fetching media from {group.id}: {e}")
 
         self.telegram_client.disconnect()
 
