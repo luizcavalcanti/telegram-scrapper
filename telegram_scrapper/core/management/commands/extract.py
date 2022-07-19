@@ -54,6 +54,7 @@ class Command(BaseCommand):
         groups = Group.objects.all()
         for group in groups:
             try:
+                self.stdout.write(f"Fetching {group.id} messages…")
                 if group.active:
                     self._update_group_messages(group.id, query_size)
                 self._update_group_reports(group.id)
@@ -86,7 +87,6 @@ class Command(BaseCommand):
         self.stdout.write("done")
 
     def _update_group_messages(self, group, query_size):
-        self.stdout.write(f"Fetching {group} messages…")
         messages = self.telegram_client.get_messages(group, query_size)
         for message in messages:
             try:
