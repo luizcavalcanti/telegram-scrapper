@@ -34,27 +34,31 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         days = options["days"]
         end_date = date.today() - timedelta(days=days)
+        self.stdout.write(f"Deleting media up to {end_date}...")
         self._delete_old_photos(end_date);
         self._delete_old_videos(end_date);
         self._delete_old_audios(end_date);
 
 
     def _delete_old_photos(self, end_date):
-        for message in Message.objects.filter(photo_url__isnull=False, sent_at__lte=end_date):
+        messages = Message.objects.filter(photo_url__isnull=False, sent_at__lte=end_date)
+        for message in messages.iterator():
             print(f"Removing {message.photo_url}...")
             self._delete_media(message.photo_url)
             message.photo_url = None
             message.save()
 
     def _delete_old_videos(self, end_date):
-        for message in Message.objects.filter(video_url__isnull=False, sent_at__lte=end_date):
+        messages = Message.objects.filter(video_url__isnull=False, sent_at__lte=end_date)
+        for message in messages.iterator():
             print(f"Removing {message.video_url}...")
             self._delete_media(message.video_url)
             message.video_url = None
             message.save()
 
     def _delete_old_audios(self, end_date):
-        for message in Message.objects.filter(audio_url__isnull=False, sent_at__lte=end_date):
+        messages = Message.objects.filter(audio_url__isnull=False, sent_at__lte=end_date)
+        for message in messages.iterator():
             print(f"Removing {message.audio_url}...")
             self._delete_media(message.audio_url)
             message.audio_url = None
