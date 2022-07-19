@@ -1,6 +1,7 @@
 import boto3
 import hashlib
 
+from datetime import date, timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from telethon import TelegramClient, sync
@@ -15,6 +16,7 @@ from telegram_scrapper.core.models import Message, Group
 
 MAX_AUDIO_SIZE = 250 * 1024 * 1024  # 250MB
 MAX_VIDEO_SIZE = 150 * 1024 * 1024  # 150MB
+MAX_MEDIA_AGE = 180 # in days
 
 extension_to_mime = {
     '.jpg': 'image/jpeg',
@@ -76,6 +78,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         limit = options["limit"]
         media_type = options["media_type"]
+
+        self.date_limit = date.today() - timedelta(days=MAX_MEDIA_AGE)
 
         groups = Group.objects.filter(active=True)
         for group in groups:
@@ -183,13 +187,13 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR(f"Untreated error: {e}"))
 
     def _should_download_image(self, message):
-        return message and not bool(message.photo_url)
+        return message and message.sent_at.date() > self.date_limit and not bool(message.photo_url)
 
     def _should_download_video(self, message):
-        return message and not bool(message.video_url)
+        return message and message.sent_at.date() > self.date_limit and not bool(message.video_url)
 
     def _should_download_audio(self, message):
-        return message and not bool(message.audio_url)
+        return message and message.sent_at.date() > self.date_limit and not bool(message.audio_url)
 
     def _upload_media(self, media, extension):
         if not extension:
