@@ -16,7 +16,7 @@ from telegram_scrapper.core.models import Message, Group
 
 MAX_AUDIO_SIZE = 250 * 1024 * 1024  # 250MB
 MAX_VIDEO_SIZE = 150 * 1024 * 1024  # 150MB
-MAX_MEDIA_AGE = 180 # in days
+MAX_MEDIA_AGE = 90 # in days
 
 extension_to_mime = {
     '.jpg': 'image/jpeg',
