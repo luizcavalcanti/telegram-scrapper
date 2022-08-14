@@ -95,6 +95,9 @@ class Command(BaseCommand):
                 self.stderr.write(f"{e}")
 
     def _save_message(self, message, group):
+        if Message.objects.filter(message_id=message.id, group=group).exists():
+            return
+
         obj = Message(
             message_id=message.id,
             message=message.message if message.message else '',
@@ -111,8 +114,7 @@ class Command(BaseCommand):
 
             setattr(obj, kind, media.to_json())
 
-        if not Message.objects.filter(message_id=obj.message_id, group=obj.group).exists():
-            obj.save()
+        obj.save()
 
     def _get_sender(self, message):
         return (
