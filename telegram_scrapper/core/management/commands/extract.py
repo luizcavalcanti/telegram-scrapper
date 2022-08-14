@@ -92,7 +92,7 @@ class Command(BaseCommand):
             try:
                 self._save_message(message, group)
             except IntegrityError as e:
-                pass
+                self.stderr.write(f"{e}")
 
     def _save_message(self, message, group):
         obj = Message(
@@ -111,7 +111,8 @@ class Command(BaseCommand):
 
             setattr(obj, kind, media.to_json())
 
-        obj.save()
+        if not Message.objects.filter(message_id=obj.message_id, group=obj.group).exists():
+            obj.save()
 
     def _get_sender(self, message):
         return (
