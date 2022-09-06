@@ -55,9 +55,8 @@ class Command(BaseCommand):
         for group in groups:
             try:
                 self.stdout.write(f"Fetching {group.id} messages…")
-                if group.active:
-                    self._update_group_messages(group.id, query_size)
-                self._update_group_reports(group.id)
+                if group.active and self._update_group_messages(group.id, query_size):
+                    self._update_group_reports(group.id)
             except Exception as e:  # Unpredicted errors trap :/
                 self.stderr.write(f"Error fetching messages from {group.id}: {e}")
 
@@ -87,12 +86,16 @@ class Command(BaseCommand):
         self.stdout.write("done")
 
     def _update_group_messages(self, group, query_size):
+        messages_saved = False
         messages = self.telegram_client.get_messages(group, query_size)
         for message in messages:
             try:
                 self._save_message(message, group)
+                messages_saved = True
             except IntegrityError as e:
                 self.stderr.write(f"{e}")
+
+        return messages_saved
 
     def _save_message(self, message, group):
         if Message.objects.filter(message_id=message.id, group=group).exists():
