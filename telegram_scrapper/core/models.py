@@ -20,6 +20,7 @@ class Message(models.Model):
     photo = models.JSONField("imagem", default=dict)
     photo_url = models.CharField("URL da imagem", max_length=1024, null=True)
     forwarded = models.BooleanField("encaminhada", default=False)
+    media_id = models.BigIntegerField("ID da mídia", null=True)
     search_vector = SearchVectorField(null=True)
 
     class Meta:
@@ -30,6 +31,7 @@ class Message(models.Model):
             models.Index(fields=["sent_at"]),
             models.Index(fields=["group"]),
             models.Index(fields=["sender"]),
+            models.Index(fields=["media_id"]),
             GinIndex(fields=['search_vector']),
         ]
         unique_together = ["message_id", "group"]

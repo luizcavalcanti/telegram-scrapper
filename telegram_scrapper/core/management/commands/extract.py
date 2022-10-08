@@ -116,6 +116,7 @@ class Command(BaseCommand):
                 continue
 
             setattr(obj, kind, media.to_json())
+            obj.media_id = media.id
 
         obj.save()
 
