@@ -84,6 +84,7 @@ class Command(BaseCommand):
         groups = Group.objects.filter(active=True)
         for group in groups:
             try:
+                self.stdout.write(f"Fetching {group.id}...")
                 self._download_media_for_group(group.id, limit, media_type)
             except Exception as e:  # Unpredicted errors trap :/
                 self.stderr.write(f"Error fetching media from {group.id}: {e}")
@@ -195,30 +196,43 @@ class Command(BaseCommand):
     def _should_download_audio(self, message):
         return message and message.sent_at.date() > self.date_limit and not bool(message.audio_url)
 
+    def _duplicate_media_url(self, media):
+        urls = Message.objects.filter(media_id=media.id).values_list('photo_url', 'video_url', 'audio_url').distinct()
+        if urls:
+            for url in urls[0]:
+                if url:
+                    return url
+        return None
+
     def _upload_media(self, media, extension):
         if not extension:
             raise CommandError(f"Media has no extension")
 
-        file_bytes = self.telegram_client.download_media(media, file=bytes)
+        downloaded_media_url = self._duplicate_media_url(media)
+        if downloaded_media_url:
+            print("Media already downloaded, reusing...")
+            return downloaded_media_url
+        else:
+            file_bytes = self.telegram_client.download_media(media, file=bytes)
 
-        file_hash = hashlib.md5()
-        file_hash.update(file_bytes)
+            file_hash = hashlib.md5()
+            file_hash.update(file_bytes)
 
-        file_name = f"{file_hash.hexdigest()}{extension}"
-        mime_type = extension_to_mime.get(extension, 'binary/octet-stream')
-        bucket_name = f"{settings.AWS_STORAGE_BUCKET_NAME}"
+            file_name = f"{file_hash.hexdigest()}{extension}"
+            mime_type = extension_to_mime.get(extension, 'binary/octet-stream')
+            bucket_name = f"{settings.AWS_STORAGE_BUCKET_NAME}"
 
-        try:
-            # do nothing if file exists in bucket
-            self.s3_client.head_object(Bucket=bucket_name, Key=file_name)
-        except Exception as e:
-            self.s3_client.put_object(
-                Body=file_bytes,
-                Bucket=bucket_name,
-                Key=file_name,
-                ACL='public-read',
-                CacheControl='max-age=31556926',
-                ContentType=mime_type,
-            )
+            try:
+                # do nothing if file exists in bucket
+                self.s3_client.head_object(Bucket=bucket_name, Key=file_name)
+            except Exception as e:
+                self.s3_client.put_object(
+                    Body=file_bytes,
+                    Bucket=bucket_name,
+                    Key=file_name,
+                    ACL='public-read',
+                    CacheControl='max-age=31556926',
+                    ContentType=mime_type,
+                )
 
-        return f"{self.s3_base_public_url}/{file_name}"
+            return f"{self.s3_base_public_url}/{file_name}"

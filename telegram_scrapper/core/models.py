@@ -26,7 +26,6 @@ class Message(models.Model):
     class Meta:
         verbose_name = "mensagem"
         verbose_name_plural = "mensagens"
-        ordering = ["-sent_at"]
         indexes = [
             models.Index(fields=["sent_at"]),
             models.Index(fields=["group"]),
