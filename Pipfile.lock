@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f907b9ac2fcb3dea1fd0933f9b86068ba57ae71a33aca282267dc2ebcbf1bff6"
+            "sha256": "f8f7c6c527a36c787b798bb0fcfe4625e6e2f43ee709e80259f597b2daf3c46f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -194,14 +194,6 @@
             "index": "pypi",
             "version": "==2.0.1"
         },
-        "plotly": {
-            "hashes": [
-                "sha256:6598393e898a9c5ae78397f76f07002ec41fd92e5f746d3b9806248d53885643",
-                "sha256:c3da90d41cab36722048eaa5d0eee7a286a55982835980e5f183e5536b823f07"
-            ],
-            "index": "pypi",
-            "version": "==5.3.1"
-        },
         "psycopg2": {
             "hashes": [
                 "sha256:079d97fc22de90da1d370c90583659a9f9a6ee4007355f5825e5f1c70dffc1fa",
@@ -287,11 +279,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:43a5575eea6d3459789316e1596a3d2a0d215260cacf4189508112f35c9a145b",
-                "sha256:66b8598da112b8dc8cd941d54cf63ef91d3b50657b374457eda5851f3ff6a899"
+                "sha256:1b6bdc6161661409c5f21508763dc63ab20a9ac2f8ba20029aaaa7fdb9118012",
+                "sha256:3050e338e5871e70c72983072fe34f6032ae1cdeeeb67338199c2f74e083a80e"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==60.8.2"
+            "version": "==65.4.1"
         },
         "shellingham": {
             "hashes": [
