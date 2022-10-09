@@ -11,6 +11,8 @@ from django.db.models.functions import TruncDate
 from django.db.utils import IntegrityError
 from telethon import TelegramClient, sync
 from telethon.tl.types import PeerUser
+
+from telegram_scrapper.api.services import ReportsService
 from telegram_scrapper.core.models import MEDIAS, Message, Group, Report
 
 import glob
@@ -71,18 +73,6 @@ class Command(BaseCommand):
         )
 
         messages.update(search_vector=search_vector)
-        self.stdout.write("done")
-
-    def _update_general_reports(self):
-        self.stdout.write(f"Creating general reports… ", ending='')
-        self.stdout.flush()
-        Report.objects.update_or_create(
-            id=f"general_messages",
-            defaults={
-                'report_data': json.dumps({'count': Message.objects.count()}),
-                'updated_at': timezone.now()
-            }
-        )
         self.stdout.write("done")
 
     def _update_group_messages(self, group, query_size):
@@ -153,3 +143,27 @@ class Command(BaseCommand):
                 'updated_at': timezone.now()
             }
         )
+
+    def _update_general_reports(self):
+        import warnings
+        warnings.filterwarnings("ignore")
+
+        self.stdout.write(f"Creating general reports… ")
+        self.stdout.write(f"Summarization… ")
+
+        Report.objects.update_or_create(
+            id=f"general_messages",
+            defaults={
+                'report_data': json.dumps({'count': Message.objects.count()}),
+                'updated_at': timezone.now()
+            }
+        )
+
+        service = ReportsService()
+        days = [7, 15, 30, 60, 90, 180, 365]
+        self.stdout.write(f"Messages per day and rankings… ")
+        for days_count in days:
+            service.messages_per_day(days_count, force_generation=True)
+            service.top_users(days_count, 10, force_generation=True)
+
+        self.stdout.write("done")

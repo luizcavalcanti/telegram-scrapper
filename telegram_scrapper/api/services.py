@@ -17,11 +17,11 @@ class ReportsService:
     def __init__(self):
         pass
 
-    def messages_per_day(self, past_days):
+    def messages_per_day(self, past_days, force_generation=False):
         report_id = f"general_messages_per_day_{past_days}"
         try:
             report = Report.objects.get(id=report_id)
-            if datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.MESSAGES_PER_DAY_CACHE_IN_HOURS):
+            if force_generation or (datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.MESSAGES_PER_DAY_CACHE_IN_HOURS)):
                 data = self._generate_messages_per_day_report(report_id, past_days)
             else:
                 data = json.loads(report.report_data)
@@ -30,11 +30,11 @@ class ReportsService:
 
         return data
 
-    def top_users(self, past_days, limit):
+    def top_users(self, past_days, limit, force_generation=False):
         report_id = f"general_top_users_{past_days}_{limit}"
         try:
             report = Report.objects.get(id=report_id)
-            if datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.TOP_USERS_CACHE_IN_HOURS):
+            if force_generation or (datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.TOP_USERS_CACHE_IN_HOURS)):
                 data = self._generate_top_users_report(report_id, past_days, limit)
             else:
                 data = json.loads(report.report_data)
