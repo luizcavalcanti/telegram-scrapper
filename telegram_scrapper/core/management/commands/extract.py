@@ -163,7 +163,7 @@ class Command(BaseCommand):
         )
 
         service = ReportsService()
-        days = [7, 15, 30, 60, 90, 180, 365]
+        days = [7, 15, 30, 60, 90, 120, 180, 365]
         self.stdout.write(f"Messages per day and rankings… ")
         for days_count in days:
             service.messages_per_day(days_count, force_generation=True)
