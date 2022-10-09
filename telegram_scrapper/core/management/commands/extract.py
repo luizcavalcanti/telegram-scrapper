@@ -17,6 +17,7 @@ from telegram_scrapper.core.models import MEDIAS, Message, Group, Report
 
 import glob
 import json
+import warnings
 
 
 MESSAGES_PER_QUERY = 1000
@@ -46,9 +47,10 @@ class Command(BaseCommand):
         query_size = options["limit"]
 
         self._fetch_new_messages(query_size)
+        self.telegram_client.disconnect()
+
         self._update_search_vector()
         self._update_general_reports()
-        self.telegram_client.disconnect()
 
         self.stdout.write(self.style.SUCCESS(f"OK"))
 
@@ -116,10 +118,12 @@ class Command(BaseCommand):
         )
 
     def _update_group_reports(self, group_id):
+        warnings.filterwarnings("ignore")
         self.stdout.write("Updating reports… ", ending='')
 
         self._update_messages_count(group_id)
-        self._update_group_activity(group_id)
+        service = ReportsService()
+        service.group_activity(group_id, force_generation=True)
 
         self.stdout.write("done")
 
@@ -145,7 +149,6 @@ class Command(BaseCommand):
         )
 
     def _update_general_reports(self):
-        import warnings
         warnings.filterwarnings("ignore")
 
         self.stdout.write(f"Creating general reports… ")

@@ -43,6 +43,19 @@ class ReportsService:
 
         return data
 
+    def group_activity(self, group_id, past_days=90, force_generation=False):
+        report_id = f"group_activity_{group_id}"
+        try:
+            report = Report.objects.get(id=report_id)
+            if force_generation or (datetime.now(timezone.utc) - report.updated_at > timedelta(hours=ReportsService.MESSAGES_PER_DAY_CACHE_IN_HOURS)):
+                data = self._generate_group_activity_report(report_id, group_id, past_days)
+            else:
+                data = json.loads(report.report_data)
+        except Report.DoesNotExist:
+            data = self._generate_group_activity_report(report_id, group_id, past_days)
+
+        return data
+
     def _generate_messages_per_day_report(self, report_id, past_days):
         start_date = datetime.today() - timedelta(days=past_days)
         end_date = datetime.today()
@@ -59,6 +72,23 @@ class ReportsService:
                       'updated_at': timezone.now()}
         )
         return data
+
+    def _generate_group_activity_report(self, report_id, group_id, past_days):
+        start_date = datetime.today() - timedelta(days=past_days)
+        activity = list(Message.objects.filter(group=group_id, sent_at__gte=start_date.date())
+                        .order_by('-sent_at')
+                        .annotate(date=TruncDate('sent_at'))
+                        .order_by('date')
+                        .values('date')
+                        .annotate(**{'total': Count('sent_at')}))
+
+        Report.objects.update_or_create(
+            id=report_id,
+            defaults={
+                'report_data': json.dumps(activity, cls=DjangoJSONEncoder),
+                'updated_at': timezone.now()
+            }
+        )
 
     def _generate_top_users_report(self, report_id, past_days, limit):
         start_date = datetime.today() - timedelta(days=past_days)
