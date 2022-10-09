@@ -55,11 +55,11 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"OK"))
 
     def _fetch_new_messages(self, query_size):
-        groups = Group.objects.all()
+        groups = Group.objects.filter(active=True)
         for group in groups:
             try:
                 self.stdout.write(f"Fetching {group.id} messages…")
-                if group.active and self._update_group_messages(group.id, query_size):
+                if self._update_group_messages(group.id, query_size):
                     self._update_group_reports(group.id)
             except Exception as e:  # Unpredicted errors trap :/
                 self.stderr.write(f"Error fetching messages from {group.id}: {e}")
