@@ -58,9 +58,8 @@ class ReportsService:
 
     def _generate_messages_per_day_report(self, report_id, past_days):
         start_date = datetime.today() - timedelta(days=past_days)
-        end_date = datetime.today()
         data = list(
-            Message.objects.filter(sent_at__range=[start_date.date(), end_date.date()])
+            Message.objects.filter(sent_at__gte=start_date.date())
             .annotate(date=TruncDate('sent_at'))
             .order_by('date')
             .values('date')
@@ -92,9 +91,8 @@ class ReportsService:
 
     def _generate_top_users_report(self, report_id, past_days, limit):
         start_date = datetime.today() - timedelta(days=past_days)
-        end_date = datetime.today() + timedelta(days=1)
         data = (
-            Message.objects.filter(sent_at__range=[start_date.date(), end_date.date()])
+            Message.objects.filter(sent_at__gte=start_date.date())
             .exclude(sender='channel')
             .annotate(count=Count('sender'))
             .order_by('-count')
