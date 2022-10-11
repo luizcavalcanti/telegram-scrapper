@@ -2,6 +2,10 @@
 {% load humanize %}
 {% block content %}
 
+<p>
+  <span>Base exportada em <a href="https://telegram-scrapper-dumps.s3.us-east-2.amazonaws.com/dump_csv.tar.gz">CSV</a> e <a href="https://telegram-scrapper-dumps.s3.us-east-2.amazonaws.com/dump.tar.gz">SQL</a> (~2.2GB). Exportado segundas, quartas e sextas-feiras</span>
+</p>
+
 <div class="dash-panel" onclick="location.href='/groups';" style="cursor: pointer;">
   <span class="data">{{ total_groups | intcomma }}</span>
   <span class="description">Grupos monitorados</span>
