@@ -43,26 +43,42 @@ class Command(BaseCommand):
     def _delete_old_photos(self, end_date):
         messages = Message.objects.filter(photo_url__isnull=False, sent_at__lte=end_date)
         for message in messages.iterator():
-            print(f"Removing {message.photo_url}...")
-            self._delete_media(message.photo_url)
-            message.photo_url = None
-            message.save()
+            if self._check_if_needed(message.media_id, end_date):
+                print("Skiping needed media...")
+            else:
+                print(f"Removing {message.photo_url}...")
+                self._delete_media(message.photo_url)
+                message.photo_url = None
+                message.save()
 
     def _delete_old_videos(self, end_date):
         messages = Message.objects.filter(video_url__isnull=False, sent_at__lte=end_date)
         for message in messages.iterator():
-            print(f"Removing {message.video_url}...")
-            self._delete_media(message.video_url)
-            message.video_url = None
-            message.save()
+            if self._check_if_needed(message.media_id, end_date):
+                print("Skiping needed media...")
+            else:
+                print(f"Removing {message.video_url}...")
+                self._delete_media(message.video_url)
+                message.video_url = None
+                message.save()
 
     def _delete_old_audios(self, end_date):
         messages = Message.objects.filter(audio_url__isnull=False, sent_at__lte=end_date)
         for message in messages.iterator():
-            print(f"Removing {message.audio_url}...")
-            self._delete_media(message.audio_url)
-            message.audio_url = None
-            message.save()
+            if self._check_if_needed(message.media_id, end_date):
+                print("Skiping needed media...")
+            else:
+                print(f"Removing {message.audio_url}...")
+                self._delete_media(message.audio_url)
+                message.audio_url = None
+                message.save()
+
+    def _check_if_needed(self, media_id, end_date):
+        needed = False
+        if media_id:
+            needed = True if Message.objects.filter(media_id=media_id, sent_at__gt=end_date) else False
+
+        return needed
 
     def _delete_media(self, media_url):
         file_name = media_url.split('/')[-1]
