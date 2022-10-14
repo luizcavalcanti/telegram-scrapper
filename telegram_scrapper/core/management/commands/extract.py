@@ -10,7 +10,7 @@ from django.db.models import Count
 from django.db.models.functions import TruncDate
 from django.db.utils import IntegrityError
 from telethon import TelegramClient, sync
-from telethon.tl.types import PeerUser
+from telethon.tl.types import PeerUser, MessageActionChatAddUser
 
 from telegram_scrapper.api.services import ReportsService
 from telegram_scrapper.core.models import MEDIAS, Message, Group, Report
@@ -81,11 +81,12 @@ class Command(BaseCommand):
         messages_saved = False
         messages = self.telegram_client.get_messages(group, query_size)
         for message in messages:
-            try:
-                self._save_message(message, group)
-                messages_saved = True
-            except IntegrityError as e:
-                self.stderr.write(f"{e}")
+            if type(message.action) is not MessageActionChatAddUser:
+                try:
+                    self._save_message(message, group)
+                    messages_saved = True
+                except IntegrityError as e:
+                    self.stderr.write(f"{e}")
 
         return messages_saved
 
