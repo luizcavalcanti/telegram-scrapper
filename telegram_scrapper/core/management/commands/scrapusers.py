@@ -34,12 +34,13 @@ class Command(BaseCommand):
         for group in groups:
             self.stdout.write(f"Retrieving users from {group.id}...")
             try:
-                participants = self.telegram_client.get_participants(group.id)
+                count = 0
+                for p in self.telegram_client.iter_participants(group.id):
+                    count += 1
+                    self._save_user(p)
 
-                group.users_count = len(participants)
+                group.users_count = count
                 group.save()
-
-                [self._save_user(p) for p in participants]
             except ChatAdminRequiredError as e:
                 self.stdout.write("Cannot check user list, skipping.")
             except TypeError as e:
