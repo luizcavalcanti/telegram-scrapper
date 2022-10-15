@@ -3,6 +3,8 @@ from django.core.management.base import BaseCommand
 from telethon import TelegramClient, sync
 from telethon.errors.rpcerrorlist import ChatAdminRequiredError
 from telegram_scrapper.core.models import Group, TelegramUser
+from telethon.tl.types import ChannelParticipantsRecent
+from telethon.tl.functions.channels import GetFullChannelRequest
 
 
 class Command(BaseCommand):
@@ -34,12 +36,10 @@ class Command(BaseCommand):
         for group in groups:
             self.stdout.write(f"Retrieving users from {group.id}...")
             try:
-                count = 0
-                for p in self.telegram_client.iter_participants(group.id):
-                    count += 1
-                    self._save_user(p)
+                [self._save_user(p) for p in self.telegram_client.iter_participants(group.id, filter=ChannelParticipantsRecent)]
 
-                group.users_count = count
+                group_info = self.telegram_client(GetFullChannelRequest(channel=group.id))
+                group.users_count = group_info.full_chat.participants_count
                 group.save()
             except ChatAdminRequiredError as e:
                 self.stdout.write("Cannot check user list, skipping.")
