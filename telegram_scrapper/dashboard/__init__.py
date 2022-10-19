@@ -46,7 +46,7 @@ def messages(request):
         results = Message.objects.order_by("-sent_at").all()
         occurency = None
 
-    paginator = MessagesPaginator(results, 100)
+    paginator = MessagesPaginator(results, 100, has_filter=bool(query))
     page_obj = paginator.get_page(page_number)
 
     return render(
