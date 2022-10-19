@@ -10,6 +10,7 @@ from django.urls import path
 from types import SimpleNamespace
 
 from telegram_scrapper.core.models import Group, Message, TelegramUser, Report
+from .paginators import MessagesPaginator
 
 
 def home(request):
@@ -42,10 +43,10 @@ def messages(request):
             entry['date'] = datetime.strftime(entry['date'], "%Y-%m-%d")
 
     else:
-        results = Message.objects.all().order_by("-sent_at")
+        results = Message.objects.order_by("-sent_at").all()
         occurency = None
 
-    paginator = Paginator(results, 100)
+    paginator = MessagesPaginator(results, 100)
     page_obj = paginator.get_page(page_number)
 
     return render(
