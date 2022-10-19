@@ -27,7 +27,7 @@ class Message(models.Model):
         verbose_name = "mensagem"
         verbose_name_plural = "mensagens"
         indexes = [
-            models.Index(fields=["sent_at"]),
+            models.Index(fields=["-sent_at"]),
             models.Index(fields=["group"]),
             models.Index(fields=["sender"]),
             models.Index(fields=["media_id"]),
