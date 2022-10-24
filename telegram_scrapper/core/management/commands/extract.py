@@ -30,7 +30,9 @@ class Command(BaseCommand):
     def telegram_client(self):
         if not getattr(self, "_telegram_client", None):
             self._telegram_client = TelegramClient(
-                "message_scrapping", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH
+                "message_scrapping",
+                settings.TELEGRAM_API_ID,
+                settings.TELEGRAM_API_HASH,
             ).start()
 
         return self._telegram_client
@@ -66,7 +68,9 @@ class Command(BaseCommand):
 
     def _update_search_vector(self):
         messages = Message.objects.filter(search_vector=None)
-        self.stdout.write(f"Creating search vector for {messages.count()} messages… ", ending='')
+        self.stdout.write(
+            f"Creating search vector for {messages.count()} messages… ", ending=""
+        )
 
         search_vector = (
             SearchVector("message", config="portuguese", weight="A")
@@ -96,7 +100,7 @@ class Command(BaseCommand):
 
         obj = Message(
             message_id=message.id,
-            message=message.message if message.message else '',
+            message=message.message if message.message else "",
             group=group,
             sender=self._get_sender(message),
             sent_at=message.date,
@@ -120,7 +124,7 @@ class Command(BaseCommand):
 
     def _update_group_reports(self, group_id):
         warnings.filterwarnings("ignore")
-        self.stdout.write("Updating reports… ", ending='')
+        self.stdout.write("Updating reports… ", ending="")
 
         self._update_messages_count(group_id)
         service = ReportsService()
@@ -134,19 +138,21 @@ class Command(BaseCommand):
         group.save()
 
     def _update_group_activity(self, group_id):
-        activity = list(Message.objects.filter(group=group_id)
-                        .order_by('-sent_at')
-                        .annotate(date=TruncDate('sent_at'))
-                        .order_by('date')
-                        .values('date')
-                        .annotate(**{'total': Count('sent_at')}))
+        activity = list(
+            Message.objects.filter(group=group_id)
+            .order_by("-sent_at")
+            .annotate(date=TruncDate("sent_at"))
+            .order_by("date")
+            .values("date")
+            .annotate(**{"total": Count("sent_at")})
+        )
 
         Report.objects.update_or_create(
             id=f"group_activity_{group_id}",
             defaults={
-                'report_data': json.dumps(activity, cls=DjangoJSONEncoder),
-                'updated_at': timezone.now()
-            }
+                "report_data": json.dumps(activity, cls=DjangoJSONEncoder),
+                "updated_at": timezone.now(),
+            },
         )
 
     def _update_general_reports(self):
@@ -158,12 +164,16 @@ class Command(BaseCommand):
         Report.objects.update_or_create(
             id=f"general_messages",
             defaults={
-                'report_data': json.dumps({'count': Message.objects.count()}),
-                'updated_at': timezone.now()
-            }
+                "report_data": json.dumps({"count": Message.objects.count()}),
+                "updated_at": timezone.now(),
+            },
         )
 
         service = ReportsService()
+
+        self.stdout.write(f"Trending topics… ")
+        service.trends(1, 20, force_generation=True)
+
         days = [7, 15, 30, 60, 90, 120, 180, 365]
         self.stdout.write(f"Messages per day and rankings… ")
         for days_count in days:
