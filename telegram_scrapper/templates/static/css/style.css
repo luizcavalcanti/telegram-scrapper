@@ -16,6 +16,19 @@ audio {
     width: 350px;
 }
 
+ol {
+    font-size: 16pt;
+}
+
+li {
+    color: var(--secondary-color);
+    padding-bottom: 3px;
+}
+
+li .detail{
+    font-size: 12pt;
+}
+
 a:link, a:visited, a:hover {
     color: var(--primary-color);
     text-decoration: none;
@@ -106,6 +119,13 @@ div.report-panel {
     padding-bottom: 10px;
     width: 700px;
     height: 365px;
+}
+
+div.header {
+    margin: 0 0 5px 0;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 12pt;
 }
 
 .report-panel .header {

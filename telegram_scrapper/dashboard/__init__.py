@@ -14,33 +14,42 @@ from .paginators import MessagesPaginator
 
 
 def home(request):
-    messages_data = Report.objects.get(id='general_messages').report_data
-    total_messages = json.loads(messages_data)['count']
+    messages_data = Report.objects.get(id="general_messages").report_data
+    trends_data = Report.objects.get(id="general_trends_1").report_data
+    total_messages = json.loads(messages_data)["count"]
     total_groups = Group.objects.count()
     total_users = TelegramUser.objects.count()
 
     context_data = {
-        'total_messages': total_messages,
-        'total_groups': total_groups,
-        'total_users': total_users
+        "total_messages": total_messages,
+        "total_groups": total_groups,
+        "total_users": total_users,
+        "trends_data": json.loads(trends_data),
     }
-    return render(request, 'dashboard.html', context_data)
+    return render(request, "dashboard.html", context_data)
 
 
 def _occurency_for_messages(queryset):
-    return queryset.annotate(date=TruncDate('sent_at')).order_by('date').values('date').annotate(**{'total': Count('sent_at')})
+    return (
+        queryset.annotate(date=TruncDate("sent_at"))
+        .order_by("date")
+        .values("date")
+        .annotate(**{"total": Count("sent_at")})
+    )
 
 
 def messages(request):
-    query = request.GET.get('query')
-    page_number = request.GET.get('page', 1)
+    query = request.GET.get("query")
+    page_number = request.GET.get("page", 1)
 
     if query:
         search_query = SearchQuery(query, config="portuguese")
-        results = Message.objects.filter(search_vector=search_query).order_by("-sent_at")
+        results = Message.objects.filter(search_vector=search_query).order_by(
+            "-sent_at"
+        )
         occurency = _occurency_for_messages(results)
         for entry in occurency:
-            entry['date'] = datetime.strftime(entry['date'], "%Y-%m-%d")
+            entry["date"] = datetime.strftime(entry["date"], "%Y-%m-%d")
 
     else:
         results = Message.objects.order_by("-sent_at").all()
@@ -51,91 +60,86 @@ def messages(request):
 
     return render(
         request,
-        'messages.html',
+        "messages.html",
         {
-            'query': query,
-            'results': page_obj,
-            'results_count': paginator.count,
-            'occurency': occurency
-        }
+            "query": query,
+            "results": page_obj,
+            "results_count": paginator.count,
+            "occurency": occurency,
+        },
     )
 
 
 def groups(request):
-    page_number = request.GET.get('page', 1)
+    page_number = request.GET.get("page", 1)
 
     results = Group.objects.all()
     paginator = Paginator(results, 100)
     page_obj = paginator.get_page(page_number)
 
     return render(
-        request,
-        'groups.html',
-        {
-            'results': page_obj,
-            'results_count': paginator.count
-        }
+        request, "groups.html", {"results": page_obj, "results_count": paginator.count}
     )
 
 
 def group(request, group_id):
     group = Group.objects.get(id=group_id)
-    queryset = Message.objects.filter(group=group_id).order_by('-sent_at')
+    queryset = Message.objects.filter(group=group_id).order_by("-sent_at")
     last_messages = queryset[:30]
 
     try:
-        report = Report.objects.get(id=f'group_activity_{group_id}')
+        report = Report.objects.get(id=f"group_activity_{group_id}")
         activity = json.loads(report.report_data)
     except:
         activity = None
 
     return render(
         request,
-        'group.html',
-        {
-            'group': group,
-            'last_messages': last_messages,
-            'activity': activity
-        }
+        "group.html",
+        {"group": group, "last_messages": last_messages, "activity": activity},
     )
 
 
 def users(request):
-    page_number = request.GET.get('page', 1)
-    results = TelegramUser.objects.order_by('user_id')
+    page_number = request.GET.get("page", 1)
+    results = TelegramUser.objects.order_by("user_id")
     paginator = Paginator(results, 100)
     page_obj = paginator.get_page(page_number)
 
     return render(
-        request,
-        'users.html',
-        {
-            'results': page_obj,
-            'results_count': paginator.count
-        }
+        request, "users.html", {"results": page_obj, "results_count": paginator.count}
     )
 
 
 def user(request, user_id):
     user = TelegramUser.objects.get(user_id=user_id)
-    last_messages =  Message.objects.filter(sender=user_id).order_by('-sent_at')[:30]
-    groups = list(map(
-        lambda m: m['group'],
-        Message.objects.filter(sender=user_id).values('group').distinct('group').order_by('group')
-    ))
+    last_messages = Message.objects.filter(sender=user_id).order_by("-sent_at")[:30]
+    groups = list(
+        map(
+            lambda m: m["group"],
+            Message.objects.filter(sender=user_id)
+            .values("group")
+            .distinct("group")
+            .order_by("group"),
+        )
+    )
 
-    return render(request, 'user.html', { 'user': user, 'last_messages': last_messages, 'groups': groups })
+    return render(
+        request,
+        "user.html",
+        {"user": user, "last_messages": last_messages, "groups": groups},
+    )
 
 
 urls = (
     [
-        path('', home, name='dashboard'),
-        path('messages/', messages, name='messages'),
-        path('groups/', groups, name='groups'),
-        path('groups/<str:group_id>', group, name='group'),
-        path('users/', users, name='users'),
-        path('users/<int:user_id>/', user, name='user')
+        path("", home, name="dashboard"),
+        path("messages/", messages, name="messages"),
+        path("groups/", groups, name="groups"),
+        path("groups/<str:group_id>", group, name="group"),
+        path("users/", users, name="users"),
+        path("users/<int:user_id>/", user, name="user"),
     ],
-    '',
-    '',
+    "",
+    "",
 )

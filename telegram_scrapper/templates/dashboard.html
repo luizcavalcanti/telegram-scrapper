@@ -21,9 +21,21 @@
   <span class="description">Usuários indexados</span>
 </div>
 {% include "dashboard/_graph_messages_per_day.html" %}
+
+<div class="header">
+  Trending (últimas 24 horas)
+</div>
+<div class="graph">
+  <ol>
+  {% for trend, count in trends_data.items %}
+    <li class="trend">{{ trend | title }} <span class="detail">({{ count | intcomma }})</span></li>
+  {% endfor %}
+  </ol>
+</div>
+
 {% include "dashboard/_table_top_users.html" %}
 
-<p>TODO:</p>
+<!-- <p>TODO:</p>
 <ul>
   <li>Videos mais frequentes</li>
   <li>Imagens mais frequentes</li>
@@ -33,7 +45,7 @@
     <li>Videos mais frequentes</li>
     <li>Audios mais frequentes</li>
   </ul>
-</ul>
+</ul> -->
 
 {% endblock %}
 

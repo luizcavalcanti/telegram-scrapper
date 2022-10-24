@@ -80,6 +80,12 @@ STOPWORDS = [
     "la",
     "nosso",
     "eles",
+    "tudo",
+    "todos",
+    "vamos",
+    "nas",
+    "contra",
+    "video",
 ]
 EXCLUDED_GROUPS = [
     "epochtimeschat",
