@@ -1,0 +1,13 @@
+{% load humanize %}
+<div class="report-panel" style="height: 100%;">
+  <div class="header">
+    Trending (últimas 24 horas)
+  </div>
+  <div class="graph" style="column-count: 2;">
+    <ol>
+    {% for trend, count in trends_data.items %}
+      <li class="trend"><a href="/messages?query={{ trend }}">{{ trend }}</a> <span class="detail">({{ count | intcomma }})</span></li>
+    {% endfor %}
+    </ol>
+  </div>
+</div>
