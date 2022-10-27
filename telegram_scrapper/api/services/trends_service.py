@@ -22,21 +22,26 @@ STOPWORDS = [
     "a",
     "a",
     "agora",
+    "ai",
+    "ainda",
     "ao",
     "aos",
     "aquela",
     "aquelas",
     "aquele",
     "aqueles",
+    "aqui",
     "aquilo",
     "as",
     "as",
     "ate",
     "bem",
     "bom",
+    "canal",
     "ciao",
     "com",
     "como",
+    "contra",
     "da",
     "das",
     "de",
@@ -46,6 +51,7 @@ STOPWORDS = [
     "deles",
     "depois",
     "dia",
+    "diz",
     "do",
     "dos",
     "e",
@@ -104,6 +110,7 @@ STOPWORDS = [
     "fossem",
     "fossemos",
     "fui",
+    "gente",
     "ha",
     "haja",
     "hajam",
@@ -112,6 +119,7 @@ STOPWORDS = [
     "havemos",
     "haver",
     "hei",
+    "hoje",
     "houve",
     "houvemos",
     "houver",
@@ -146,6 +154,7 @@ STOPWORDS = [
     "minhas",
     "muito",
     "na",
+    "nada",
     "nao",
     "nas",
     "nem",
@@ -168,11 +177,13 @@ STOPWORDS = [
     "pelos",
     "pode",
     "por",
+    "porque",
     "pra",
     "qual",
     "quando",
     "que",
     "quem",
+    "quer",
     "sao",
     "se",
     "seja",
@@ -195,10 +206,11 @@ STOPWORDS = [
     "sou",
     "sua",
     "suas",
+    "ta",
     "tambem",
     "te",
     "tem",
-    "tem",
+    "ter",
     "temos",
     "tenha",
     "tenham",
@@ -228,6 +240,8 @@ STOPWORDS = [
     "tivesse",
     "tivessem",
     "tivessemos",
+    "todo",
+    "todos",
     "tu",
     "tua",
     "tuas",
@@ -267,13 +281,11 @@ class TrendsService:
 
         start_date = datetime.today() - timedelta(days=past_days)
 
-        print("Fetching all text messages")
         messages = (
             Message.objects.filter(sent_at__gte=start_date, message__isnull=False)
             .exclude(message="")
             .exclude(group__in=EXCLUDED_GROUPS)
         )
-        print(f"{messages.count()} messages found")
 
         for message in messages.iterator():
             pieces = re.split(r"[\s]", message.message)
