@@ -300,7 +300,7 @@ class TrendsService:
 
     def _is_valid_word(self, word):
         return (
-            len(word) > 0
+            len(word) > 1
             and not self._is_stopword(word)
             and not self._is_url(word)
             and not word.isdigit()
