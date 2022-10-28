@@ -226,6 +226,7 @@ STOPWORDS = [
     "teu",
     "teus",
     "teve",
+    "the",
     "tinha",
     "tinham",
     "tinhamos",
