@@ -240,6 +240,7 @@ STOPWORDS = [
     "tivesse",
     "tivessem",
     "tivessemos",
+    "to",
     "todo",
     "todos",
     "tu",
