@@ -41,19 +41,18 @@ def _occurency_for_messages(queryset):
 def messages(request):
     query = request.GET.get("query")
     page_number = request.GET.get("page", 1)
-
+    occurency = None
     if query:
         search_query = SearchQuery(query, config="portuguese")
         results = Message.objects.filter(search_vector=search_query).order_by(
             "-sent_at"
         )
-        occurency = _occurency_for_messages(results)
-        for entry in occurency:
-            entry["date"] = datetime.strftime(entry["date"], "%Y-%m-%d")
+        # occurency = _occurency_for_messages(results)
+        # for entry in occurency:
+            # entry["date"] = datetime.strftime(entry["date"], "%Y-%m-%d")
 
     else:
         results = Message.objects.order_by("-sent_at").all()
-        occurency = None
 
     paginator = MessagesPaginator(results, 100, has_filter=bool(query))
     page_obj = paginator.get_page(page_number)

@@ -4,7 +4,6 @@
 
 {% if query is not None %}
 <div class="page-title">Resultados para "{{ query }}" ({{ results_count | intcomma }} encontrados)</div>
-{% include "messages/_occurency_graph.html" %}
 {% else %}
 <div class="page-title">Mensagens ({{ results_count | intcomma }} encontrados)</div>
 {% endif %}
