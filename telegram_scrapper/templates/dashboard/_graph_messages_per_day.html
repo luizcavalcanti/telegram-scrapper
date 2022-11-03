@@ -1,81 +1,90 @@
-<div class="report-panel"> 
+<div class="report-panel" style="height: 400px"> 
   <div class="header">
     Mensagens por dia
   </div>
   <div class="graph">
-	<div class="filter">
-	  Período:
-	  <select id="message_per_day_param_days" type="select" onchange="loadData();">
-		<option value="7">7 dias</option>
-		<option value="15">15 dias</option>
-		<option value="30" selected="true">30 dias</option>
-		<option value="60">60 dias</option>
-		<option value="90">90 dias</option>
-		<option value="120">120 dias</option>
-		<option value="180">180 dias</option>
-		<option value="365">365 dias</option>
-	  </select>
-	</div>
-	<div id="total_messages"></div>
+  <div class="filter">
+    Período:
+    <select id="message_per_day_param_days" type="select" onchange="loadData();">
+    <option value="7">7 dias</option>
+    <option value="15">15 dias</option>
+    <option value="30" selected="true">30 dias</option>
+    <option value="60">60 dias</option>
+    <option value="90">90 dias</option>
+    <option value="120">120 dias</option>
+    <option value="180">180 dias</option>
+    <option value="365">365 dias</option>
+    </select>
   </div>
+  <canvas id="total_messages"></canvas>
 </div>
-<script type="text/javascript">
-  var renderData = function(data) {
-	  container = document.getElementById("total_messages").parentNode;
 
-	  margin = {top: 10, right: 30, bottom: 30, left: 60}
-	  width = container.clientWidth - margin.left - margin.right
-	  height = 300 - margin.top - margin.bottom
 
-	  d3.select("#total_messages").selectAll("*").remove();
-	  // append the svg object to div
-	  svg = d3.select("#total_messages")
-	      .append("svg")
-		  .attr("width", width + margin.left + margin.right)
-		  .attr("height", height + margin.top + margin.bottom)
-	      .append("g")
-		  .attr("transform",
-			    "translate(" + margin.left + "," + margin.top + ")");
+<script>
+var loadData = function() {
+  console.log("Loading data...")
+  days = document.getElementById("message_per_day_param_days").value;
+  d3.json("/api/messages_per_day?days="+days).then((data) => {
+    renderChart(data);
+  });
+}
 
-	  // Add X axis --> it is a date format
-	  var x = d3.scaleTime()
-	      .domain(d3.extent(data, function(d) { return d3.timeParse("%Y-%m-%d")(d.date); }))
-	      .range([ 0, width ]);
-	  svg.append("g")
-	      .attr("transform", "translate(0," + height + ")")
-	      .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d/%m")))
-	      .selectAll("text")
-		  .style("text-anchor", "end")
-		  .attr("dx", "-.8em")
-		  .attr("dy", ".15em")
-		  .attr("transform", "rotate(-35)");
+var numberFormatter = function(value, index, values) {
+  if(parseInt(value) >= 1000){
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  } else {
+    return value;
+  }
+}
 
-	  // Add Y axis
-	  var y = d3.scaleLinear()
-	      .domain([0, d3.max(data, function(d) { return +d.total; })])
-	      .range([ height, 0 ]);
-	  svg.append("g")
-	      .call(d3.axisLeft(y));
+var renderChart = function(data) {
+  const dateLabels = data.map(e => new Date(e['date']).toLocaleDateString('pt-BR'));
+  const totals = data.map(e => e['total']);
 
-	  // Add the line
-	  svg.append("path")
-		  .datum(data)
-		  .attr("fill", "none")
-		  .attr("stroke", "steelblue")
-		  .attr("stroke-width", 2)
-		  .attr("d", d3.line()
-			    .x(function(d) { return x(d3.timeParse("%Y-%m-%d")(d.date)) })
-			    .y(function(d) { return y(d.total) })
-		       );
+  const ctx = document.getElementById('total_messages');
+
+  var chartExist = Chart.getChart("total_messages");
+  if (chartExist != undefined) {
+      chartExist.destroy();
   }
 
-  var loadData = function() {
-      console.log("Loading data...")
-	  days = document.getElementById("message_per_day_param_days").value;
-	  d3.json("/api/messages_per_day?days="+days).then((data) => {
-		  renderData(data);
-	  });
-  }
+  const myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: dateLabels,
+          datasets: [{
+              label: 'Mensagens',
+              data: totals,
+              backgroundColor: 'rgba(68, 126, 155, 0.8)',
+              borderColor: 'rgba(68, 126, 155, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          plugins: {
+              legend: {
+                  display: false
+              }
+          },
+          scales: {
+              x: {
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                  beginAtZero: true,
+                  grid: {
+                    display: false
+                  },
+                  ticks: {
+                    callback: numberFormatter
+                  }
+              }
+          }
+      }
+  });
+}
 
-  loadData();
+loadData();
 </script>

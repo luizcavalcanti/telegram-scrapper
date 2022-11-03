@@ -115,7 +115,6 @@ div.dash-panel span.details {
 }
 
 div.report-panel {
-    border: 1pt solid #dbd9d9;
     margin: 10px 5px;
     padding-bottom: 10px;
     width: 700px;
@@ -133,7 +132,7 @@ div.header {
     margin: 0 0 5px 0;
     padding: 5px;
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 16pt;
 }
 
 .report-panel .filter {
