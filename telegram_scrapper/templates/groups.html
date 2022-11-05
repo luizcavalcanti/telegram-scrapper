@@ -11,6 +11,9 @@
   <thead>
     <tr>
       <th>ID do grupo</th>
+      <th>Tipo</th>
+      <th>Título</th>
+      <th>Sobre</th>
       <th>Mensagens</th>
       <th>Usuários</th>
       <th>Ativo</th>
@@ -20,6 +23,9 @@
     {% for group in results %}
     <tr>
       <td><a href="/groups/{{group.id}}">{{ group.id }}</a></td>
+      <td>{{ group.group_type }}</td>
+      <td>{{ group.title }}</td>
+      <td><div class="message">{{ group.about }}</div></td>
       <td>{{ group.messages_count | default_if_none:"0" | intcomma }}</td>
       <td>{{ group.users_count | default_if_none:"-" | intcomma }}</td>
       <td>

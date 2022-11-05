@@ -9,6 +9,18 @@
     <td>{{ group.id }}</td>
   </tr>
   <tr>
+    <td><label>Tipo</label></td>
+    <td>{{ group.group_type }}</td>
+  </tr>
+  <tr>
+    <td><label>Título</label></td>
+    <td>{{ group.title }}</td>
+  </tr>
+  <tr>
+    <td><label>Sobre</label></td>
+    <td><div class="message">{{ group.about }}</div></td>
+  </tr>
+  <tr>
     <td><label>Ativo</label></td>
     <td>
       {% if group.active %}

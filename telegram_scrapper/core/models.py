@@ -31,7 +31,7 @@ class Message(models.Model):
             models.Index(fields=["group"]),
             models.Index(fields=["sender"]),
             models.Index(fields=["media_id"]),
-            GinIndex(fields=['search_vector']),
+            GinIndex(fields=["search_vector"]),
         ]
         unique_together = ["message_id", "group"]
 
@@ -58,6 +58,9 @@ class Group(models.Model):
     users_count = models.IntegerField("usuários", null=True)
     messages_count = models.IntegerField("mensagens", null=True)
     active = models.BooleanField("ativo", default=True)
+    group_type = models.CharField("Tipo do grupo", max_length=30, null=True)
+    about = models.CharField("Sobre", max_length=1024, null=True)
+    title = models.CharField("Título do grupo", max_length=2048, null=True)
 
     class Meta:
         verbose_name = "grupo"

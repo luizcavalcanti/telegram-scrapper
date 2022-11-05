@@ -179,7 +179,7 @@ div.header {
     border-bottom: 2px solid var(--primary-color);
 }
 
-.results-table td .message {
+td .message {
     white-space: pre-wrap;
     font-family: Helvetica;
 }

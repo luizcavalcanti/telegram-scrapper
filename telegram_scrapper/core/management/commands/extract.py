@@ -10,6 +10,7 @@ from django.db.models import Count
 from django.db.models.functions import TruncDate
 from django.db.utils import IntegrityError
 from telethon import TelegramClient, sync
+from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import PeerUser, MessageActionChatAddUser
 
 from telegram_scrapper.api.services import ReportsService
@@ -126,14 +127,21 @@ class Command(BaseCommand):
         warnings.filterwarnings("ignore")
         self.stdout.write("Updating reports… ", ending="")
 
-        self._update_messages_count(group_id)
+        self._update_group_info(group_id)
         service = ReportsService()
         service.group_activity(group_id, force_generation=True)
 
         self.stdout.write("done")
 
-    def _update_messages_count(self, group_id):
+    def _update_group_info(self, group_id):
+        group_info = self.telegram_client(GetFullChannelRequest(channel=group_id))
+
         group = Group.objects.get(id=group_id)
+        group.title = group_info.chats[0].title
+        group.about = group_info.full_chat.about
+        group.group_type = (
+            "chat" if group_info.full_chat.can_view_participants else "channel"
+        )
         group.messages_count = Message.objects.filter(group=group_id).count()
         group.save()
 
