@@ -249,3 +249,6 @@ las
 and
 is
 con
+del
+es
+un
