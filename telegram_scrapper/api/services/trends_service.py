@@ -34,7 +34,7 @@ class TrendsService:
     def __init__(self):
         with open('stopwords.txt') as f:
             lines = f.read().splitlines()
-            self.stopwords = set(map(str.strip(), lines))
+            self.stopwords = set(map(str.strip, lines))
 
     def word_frequency(self, top_terms_count=10, past_days=1):
         words = self._generate_word_frequency(past_days)
