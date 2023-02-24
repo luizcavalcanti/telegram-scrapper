@@ -31,7 +31,7 @@ EXCLUDED_GROUPS = [
 
 class TrendsService:
 
-    def __init__():
+    def __init__(self):
         with open('stopwords.txt') as f:
             lines = f.read().splitlines()
             self.stopwords = set(map(str.strip(), lines))
