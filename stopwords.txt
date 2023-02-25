@@ -252,3 +252,6 @@ con
 del
 es
 un
+in
+una
+al
