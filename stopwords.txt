@@ -1,4 +1,3 @@
-STOPWORDS = [
 a
 agora
 ai
@@ -261,3 +260,5 @@ vc
 pq
 lo
 pois
+faz
+ver
